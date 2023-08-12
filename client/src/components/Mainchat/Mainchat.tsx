@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
+import socketIOClient from "socket.io-client";
 import "./Mainchat.css";
 
 type User = {
@@ -6,7 +7,76 @@ type User = {
   imagePath: string;
 };
 
+type UserMessage = {
+  message: string;
+  sentOn: string;
+};
+
 const Mainchat: React.FC<User> = (props) => {
+  const [userMessage, setUserMessage] = useState<string>("");
+  const [messages, setMessages] = useState<UserMessage[]>([]);
+
+  const rooturl = process.env.REACT_APP_ROOT_URL || "";
+
+  const updateUserMessage = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserMessage(e.target.value);
+  };
+
+  const loadMessages = useCallback(() => {
+    fetch(rooturl + "messages")
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        return setMessages(resData.messages);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [rooturl]);
+
+  useEffect(() => {
+    const socket = socketIOClient(rooturl);
+
+    const newMessageListener = (message: UserMessage) => {
+      setMessages((prevMessages) => {
+        return [...prevMessages, message];
+      });
+    };
+    socket.on("newMessage", newMessageListener);
+
+    loadMessages();
+
+    return () => {
+      socket.off("newMessage", newMessageListener);
+      socket.disconnect();
+    };
+  }, [loadMessages, rooturl]);
+
+  const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const userMessageDetails = {
+      message: userMessage,
+      sentOn: new Date().toISOString(),
+    };
+    fetch(rooturl + "send-message", {
+      method: "POST",
+      body: JSON.stringify(userMessageDetails),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        setUserMessage("");
+        console.log(resData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div className="main_chat">
       <div className="main_chat__user">
@@ -18,86 +88,21 @@ const Mainchat: React.FC<User> = (props) => {
         <span className="main_chat__user_name">{props.username}</span>
       </div>
       <div className="main_chat__user_messages">
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-            dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-          </div>
-        </div>
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-            dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-          </div>
-        </div>
-        <div className="main_chat__user_message_sender_container">
-          <div className="main_chat__user_message_sender">
-            message 2 from user 2
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
-        <div className="main_chat__user_message_receiver_container">
-          <div className="main_chat__user_message_receiver">
-            message 1 from user 1
-          </div>
-        </div>
+        {messages.map((message) => {
+          return <div>{message.message}</div>;
+        })}
       </div>
       <div className="main_chat__user_input">
-        <input
-          className="user_input"
-          name="user_input"
-          type="text"
-          placeholder="Aa"
-        />
+        <form onSubmit={sendUserMessage}>
+          <input
+            className="user_input"
+            name="user_input"
+            type="text"
+            placeholder="Aa"
+            value={userMessage}
+            onChange={updateUserMessage}
+          />
+        </form>
       </div>
     </div>
   );

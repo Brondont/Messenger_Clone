@@ -16,6 +16,7 @@
 .main_chat__user_messages {
   height: 84%;
   margin-bottom: 10px;
+
   overflow: auto;
 }
 
@@ -23,6 +24,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+}
+
+.main_chat__user_input form {
   width: 100%;
 }
 
