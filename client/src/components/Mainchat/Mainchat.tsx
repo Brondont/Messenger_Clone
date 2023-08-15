@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 import socketIOClient from "socket.io-client";
-import "./Mainchat.css";
+import "./MainChat.css";
 
 type User = {
   username: string;
@@ -12,7 +12,7 @@ type UserMessage = {
   sentOn: string;
 };
 
-const Mainchat: React.FC<User> = (props) => {
+const MainChat: React.FC<User> = (props) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
 
@@ -108,4 +108,4 @@ const Mainchat: React.FC<User> = (props) => {
   );
 };
 
-export default Mainchat;
+export default MainChat;

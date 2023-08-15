@@ -1,5 +1,5 @@
 import React from "react";
-import "./Sidebar.css";
+import "./SideBar.css";
 
 import Usercard from "../Usercard/Usercard";
 
@@ -13,7 +13,7 @@ type SideBarProps = {
   Users: User[];
 };
 
-const Sidebar: React.FC<SideBarProps> = ({ Users }) => {
+const SideBar: React.FC<SideBarProps> = ({ Users }) => {
   return (
     <div className="main_sidebar">
       <h1> Chats </h1>
@@ -26,4 +26,4 @@ const Sidebar: React.FC<SideBarProps> = ({ Users }) => {
   );
 };
 
-export default Sidebar;
+export default SideBar;
