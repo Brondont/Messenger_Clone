@@ -4,22 +4,29 @@ import "./SideBar.css";
 import Usercard from "../Usercard/Usercard";
 
 type User = {
-  id: string;
   username: string;
   imagePath: string;
+  userId: string;
 };
 
-type SideBarProps = {
+const SideBar: React.FC<{
   Users: User[];
-};
-
-const SideBar: React.FC<SideBarProps> = ({ Users }) => {
+  handleActiveUser: (userId: string) => void;
+}> = ({ Users = [], handleActiveUser }) => {
   return (
     <div className="main_sidebar">
       <h1> Chats </h1>
       <div className="user_messages">
-        {Users.map((user) => {
-          return <Usercard {...user} />;
+        {Users.map((user: User) => {
+          return (
+            <Usercard
+              key={user.userId}
+              onClick={() => {
+                handleActiveUser(user.userId);
+              }}
+              {...user}
+            />
+          );
         })}
       </div>
     </div>

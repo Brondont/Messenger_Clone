@@ -21,6 +21,10 @@ const User = sequelize.define("user", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  gender: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
   imagePath: {
     type: Sequelize.STRING,
     allowNull: false,

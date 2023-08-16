@@ -1,3 +1,7 @@
+:root {
+  --niceGray: #e4e6eb;
+}
+
 .main {
   display: flex;
   width: 100%;

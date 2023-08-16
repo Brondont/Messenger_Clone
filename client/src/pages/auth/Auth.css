@@ -18,13 +18,25 @@ section {
   border-radius: 5px;
   height: 40px;
   width: 350px;
+  font-size: 20px;
   margin: 10px;
+  padding-left: 10px;
 }
 
 .auth-form input::placeholder {
   color: rgb(167, 167, 167);
   font-size: 16px;
-  padding-left: 10px;
+  padding-left: 5px;
+}
+
+.auth-form select {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  outline: none;
+  scroll-behavior: smooth;
+  width: 350px;
+  height: 40px;
+  font-size: 20px;
+  margin: 10px;
 }
 
 .auth-form button {

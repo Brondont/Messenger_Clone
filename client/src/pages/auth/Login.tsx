@@ -2,7 +2,9 @@ import React, { ReactEventHandler } from "react";
 import { Link } from "react-router-dom";
 import "./Auth.css";
 
-const Login: React.FC = () => {
+const Login: React.FC<{
+  setUserLogin: (userId: string, token: string) => void;
+}> = ({ setUserLogin }) => {
   const rooturl = process.env.REACT_APP_ROOT_URL;
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -11,7 +13,7 @@ const Login: React.FC = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    fetch(rooturl + "login", {
+    fetch(rooturl + "/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
       headers: {
@@ -19,14 +21,15 @@ const Login: React.FC = () => {
       },
     })
       .then((res) => {
-        console.log(res);
         return res.json();
       })
       .then((resData) => {
-        console.log(resData);
+        setUserLogin(resData.userId, resData.token);
+        localStorage.setItem("userId", resData.userId);
+        localStorage.setItem("token", resData.token);
+        console.log("user Logged in successfully !");
       })
       .catch((err) => {
-        console.log("didnt get a response");
         console.log(err);
       });
   };

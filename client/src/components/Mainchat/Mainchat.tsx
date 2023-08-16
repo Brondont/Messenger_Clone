@@ -12,18 +12,23 @@ type UserMessage = {
   sentOn: string;
 };
 
-const MainChat: React.FC<User> = (props) => {
+const MainChat: React.FC<{ ActiveUserWindow: string }> = ({
+  ActiveUserWindow,
+}) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
 
   const rooturl = process.env.REACT_APP_ROOT_URL || "";
+  const token = localStorage.getItem("token");
 
   const updateUserMessage = (e: ChangeEvent<HTMLInputElement>) => {
     setUserMessage(e.target.value);
   };
 
   const loadMessages = useCallback(() => {
-    fetch(rooturl + "messages")
+    fetch(rooturl + "/messages", {
+      headers: { Authorization: "Bearer " + token },
+    })
       .then((res) => {
         return res.json();
       })
@@ -59,11 +64,12 @@ const MainChat: React.FC<User> = (props) => {
       message: userMessage,
       sentOn: new Date().toISOString(),
     };
-    fetch(rooturl + "send-message", {
+    fetch(rooturl + "/send-message", {
       method: "POST",
       body: JSON.stringify(userMessageDetails),
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
       },
     })
       .then((res) => {
@@ -79,14 +85,14 @@ const MainChat: React.FC<User> = (props) => {
   };
   return (
     <div className="main_chat">
-      <div className="main_chat__user">
+      {/* <div className="main_chat__user">
         <img
           alt={props.username}
           className="main_chat__user_name"
           src={props.imagePath}
         />
         <span className="main_chat__user_name">{props.username}</span>
-      </div>
+      </div> */}
       <div className="main_chat__user_messages">
         {messages.map((message) => {
           return <div>{message.message}</div>;
