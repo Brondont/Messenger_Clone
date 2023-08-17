@@ -5,6 +5,8 @@ const path = require("path");
 
 const db = require("./util/database");
 const User = require("./models/user");
+const Message = require("./models/message");
+const UserMessage = require("./models/userMessage");
 
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
@@ -23,8 +25,11 @@ app.use((error, req, res, next) => {
   console.log(error);
   const status = error.status || 500;
   const message = error.message;
-  res.status(status).json({ message });
+  res.status(status).json({ error: message });
 });
+
+User.belongsToMany(Message, { through: UserMessage });
+Message.belongsToMany(User, { through: UserMessage });
 
 db.sync()
   .then(() => {

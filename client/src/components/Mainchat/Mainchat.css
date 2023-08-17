@@ -1,6 +1,7 @@
 .main_chat {
   width: 100%;
   height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -14,21 +15,21 @@
 }
 
 .main_chat__user_messages {
-  height: 84%;
+  height: 100%;
   margin-bottom: 10px;
-
   overflow: auto;
 }
 
 .main_chat__user_input {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
+  justify-content: right;
+  width: 99%;
+  margin-bottom: 15px;
 }
 
 .main_chat__user_input form {
-  width: 100%;
+  width: 80%;
 }
 
 .user_input {

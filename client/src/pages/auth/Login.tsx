@@ -1,5 +1,6 @@
 import React, { ReactEventHandler } from "react";
 import { Link } from "react-router-dom";
+import Logo from "../../public/images/367690509_814737896696440_8796982152716932950_n.jpg";
 import "./Auth.css";
 
 const Login: React.FC<{
@@ -24,19 +25,23 @@ const Login: React.FC<{
         return res.json();
       })
       .then((resData) => {
+        if (resData.error) {
+          console.log(resData.error, "status code:", resData.status);
+          throw new Error(resData.error);
+        }
         setUserLogin(resData.userId, resData.token);
         localStorage.setItem("userId", resData.userId);
         localStorage.setItem("token", resData.token);
         console.log("user Logged in successfully !");
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
   };
 
   return (
     <section>
+      {/* <img src={Logo} placeholder="Logo" /> */}
       <form className="auth-form" onSubmit={handleLogin}>
+        <img src={Logo} placeholder="Logo" className="main-image" />
         <input name="email" placeholder="Email" type="email" />
         <input name="password" placeholder="Password" type="password" />
         <button type="submit"> Continue </button>

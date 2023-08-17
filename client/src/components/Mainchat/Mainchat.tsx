@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
+import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import "./MainChat.css";
 
@@ -12,12 +13,11 @@ type UserMessage = {
   sentOn: string;
 };
 
-const MainChat: React.FC<{ ActiveUserWindow: string }> = ({
-  ActiveUserWindow,
-}) => {
+const MainChat: React.FC = ({}) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
 
+  const activeUserWindow = useParams<{ recieverId: string }>().recieverId;
   const rooturl = process.env.REACT_APP_ROOT_URL || "";
   const token = localStorage.getItem("token");
 
@@ -25,22 +25,25 @@ const MainChat: React.FC<{ ActiveUserWindow: string }> = ({
     setUserMessage(e.target.value);
   };
 
-  const loadMessages = useCallback(() => {
-    fetch(rooturl + "/messages", {
+  const loadMessages = () => {
+    fetch(rooturl + "/m/" + activeUserWindow, {
       headers: { Authorization: "Bearer " + token },
     })
       .then((res) => {
         return res.json();
       })
       .then((resData) => {
+        console.log(resData);
+        console.log("hello man");
         return setMessages(resData.messages);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [rooturl]);
+  };
 
   useEffect(() => {
+    console.log("use effect ran");
     const socket = socketIOClient(rooturl);
 
     const newMessageListener = (message: UserMessage) => {
@@ -50,19 +53,21 @@ const MainChat: React.FC<{ ActiveUserWindow: string }> = ({
     };
     socket.on("newMessage", newMessageListener);
 
-    loadMessages();
+    if (activeUserWindow) {
+      loadMessages();
+    }
 
     return () => {
       socket.off("newMessage", newMessageListener);
       socket.disconnect();
     };
-  }, [loadMessages, rooturl]);
+  }, [loadMessages]);
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const userMessageDetails = {
       message: userMessage,
-      sentOn: new Date().toISOString(),
+      receiverId: activeUserWindow,
     };
     fetch(rooturl + "/send-message", {
       method: "POST",

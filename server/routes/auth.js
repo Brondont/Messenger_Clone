@@ -11,7 +11,9 @@ router.post(
   "/signup",
   [
     check("email").isEmail().withMessage("Invalid E-mail submitted"),
-    check("username").isEmpty().withMessage("Username not submitted"),
+    check("username")
+      .isLength({ min: 1 })
+      .withMessage("Username not submitted"),
     check("password")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters long."),

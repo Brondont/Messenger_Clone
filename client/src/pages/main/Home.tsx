@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 
 import SideBar from "../../components/Sidebar/SideBar";
 import MainChat from "../../components/Mainchat/MainChat";
@@ -7,7 +8,6 @@ type User = {
   id: string;
   username: string;
   imagePath: string;
-  userId: string;
 };
 
 const Home: React.FC<{ userId: string; token: string }> = ({
@@ -15,7 +15,6 @@ const Home: React.FC<{ userId: string; token: string }> = ({
   token,
 }) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [activeUserWindow, setActiveUserWindow] = useState<string>("");
 
   const rooturl = process.env.REACT_APP_ROOT_URL;
   useEffect(() => {
@@ -28,7 +27,6 @@ const Home: React.FC<{ userId: string; token: string }> = ({
         return res.json();
       })
       .then((resData) => {
-        console.log("fetch request for users sent and received");
         return setUsers(
           resData.users.map((user: User) => {
             return { ...user, imagePath: rooturl + user.imagePath };
@@ -39,13 +37,11 @@ const Home: React.FC<{ userId: string; token: string }> = ({
         console.log(err);
       });
   }, []);
-  const handleActiveUser = (userId: string) => {
-    setActiveUserWindow(userId);
-  };
+
   return (
     <>
-      <SideBar Users={users} handleActiveUser={handleActiveUser} />
-      <MainChat ActiveUserWindow={activeUserWindow} />
+      <SideBar Users={users} />
+      <MainChat />
     </>
   );
 };

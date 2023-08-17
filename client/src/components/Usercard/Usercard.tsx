@@ -4,20 +4,11 @@ import "./Usercard.css";
 type User = {
   username: string;
   imagePath: string;
-  userId: string;
 };
 
-interface UsercardProps extends User {
-  onClick: () => void;
-}
-
-const Usercard: React.FC<UsercardProps> = ({
-  username,
-  imagePath,
-  onClick,
-}) => {
+const Usercard: React.FC<User> = ({ username, imagePath }) => {
   return (
-    <div className="user_card" onClick={onClick}>
+    <div className="user_card">
       <img alt={username} className="user_card__image" src={imagePath} />
       <span className="user_card__username">{username}</span>
     </div>

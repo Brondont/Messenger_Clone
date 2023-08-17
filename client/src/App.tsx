@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
@@ -17,15 +17,22 @@ const App: React.FC = () => {
     setIsAuth(true);
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+    if (!token || !storedUserId) return;
+    setUserLogin(storedUserId, token);
+  });
+
   let routes;
   isAuth
     ? (routes = (
         <>
           <Route
-            path="/"
+            path="/m/:receiverId"
             element={<Home userId={userId} token={token} />}
           ></Route>
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to={"/m/" + userId} />} />
         </>
       ))
     : (routes = (
