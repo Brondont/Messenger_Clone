@@ -6,7 +6,6 @@ const path = require("path");
 const db = require("./util/database");
 const User = require("./models/user");
 const Message = require("./models/message");
-const UserMessage = require("./models/userMessage");
 
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
@@ -28,8 +27,10 @@ app.use((error, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-User.belongsToMany(Message, { through: UserMessage });
-Message.belongsToMany(User, { through: UserMessage });
+User.hasMany(Message, { as: "ReceivedMessages", foreignKey: "receiver_id" });
+Message.belongsTo(User, { as: "Receiver", foreignKey: "receiver_id" });
+User.hasMany(Message, { as: "SentMessages", foreignKey: "sender_id" });
+Message.belongsTo(User, { as: "Sender", foreignKey: "sender_id" });
 
 db.sync()
   .then(() => {
