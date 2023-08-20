@@ -5,9 +5,11 @@ import "./SideBar.css";
 import Usercard from "../Usercard/Usercard";
 
 type User = {
-  username: string;
-  imagePath: string;
   id: string;
+  username: string;
+  email: string;
+  imagePath: string;
+  gender: string;
 };
 
 const SideBar: React.FC<{

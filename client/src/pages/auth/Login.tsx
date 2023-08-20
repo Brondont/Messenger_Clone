@@ -32,6 +32,11 @@ const Login: React.FC<{
         setUserLogin(resData.userId, resData.token);
         localStorage.setItem("userId", resData.userId);
         localStorage.setItem("token", resData.token);
+        const remainingMiliseconds = 60 * 60 * 1000;
+        const expiryDate = new Date(
+          new Date().getTime() + remainingMiliseconds
+        );
+        localStorage.setItem("expiryDate", expiryDate.toISOString());
         console.log("user Logged in successfully !");
       })
       .catch((err) => {});

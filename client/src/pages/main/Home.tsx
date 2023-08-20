@@ -7,7 +7,9 @@ import MainChat from "../../components/Mainchat/MainChat";
 type User = {
   id: string;
   username: string;
+  email: string;
   imagePath: string;
+  gender: string;
 };
 
 const Home: React.FC<{ userId: string; token: string }> = ({
@@ -18,6 +20,7 @@ const Home: React.FC<{ userId: string; token: string }> = ({
 
   const rooturl = process.env.REACT_APP_ROOT_URL;
   useEffect(() => {
+    console.log("home page mounted");
     fetch(rooturl + "/userContacts/" + userId, {
       headers: {
         Authorization: "Bearer " + token,
@@ -41,7 +44,7 @@ const Home: React.FC<{ userId: string; token: string }> = ({
   return (
     <>
       <SideBar Users={users} />
-      <MainChat />
+      <MainChat Users={users} />
     </>
   );
 };

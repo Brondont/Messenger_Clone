@@ -17,10 +17,27 @@ const App: React.FC = () => {
     setIsAuth(true);
   };
 
+  const logoutHandler = () => {
+    setIsAuth(false);
+    setToken("");
+    setUserId("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userId");
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUserId = localStorage.getItem("userId");
-    if (!token || !storedUserId) return;
+    const token = localStorage.getItem("token") as string;
+    const storedUserId = localStorage.getItem("userId") as string;
+    const expiryDate = localStorage.getItem("expiryDate") as string;
+    if (!token || !storedUserId) {
+      return;
+    }
+    if (new Date(expiryDate) <= new Date()) {
+      logoutHandler();
+      return;
+    }
+
     setUserLogin(storedUserId, token);
   });
 
