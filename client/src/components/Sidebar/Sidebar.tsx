@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SideBar.css";
 
 import Usercard from "../Usercard/Usercard";
+import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
 
 type User = {
   id: string;
@@ -15,6 +16,14 @@ type User = {
 const SideBar: React.FC<{
   Users: User[];
 }> = ({ Users = [] }) => {
+  const [clientUser, setClientUser] = useState<User>();
+
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    setClientUser(Users.find((user) => user.id.toString() === userId));
+  }, [Users]);
+
   return (
     <div className="main_sidebar">
       <h1> Chats </h1>
@@ -27,6 +36,7 @@ const SideBar: React.FC<{
           );
         })}
       </div>
+      <UserProfileDropdown User={clientUser} />
     </div>
   );
 };

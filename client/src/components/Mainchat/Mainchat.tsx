@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import "./MainChat.css";
 
+import Usercard from "../Usercard/Usercard";
+
 type User = {
   id: string;
   username: string;
@@ -106,12 +108,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
       <div className="main_chat__user">
         {activeUser ? (
           <>
-            <img
-              alt={activeUser.username}
-              className="main_chat__user_image"
-              src={activeUser.imagePath}
-            />
-            <span className="main_chat__user_name">{activeUser.username}</span>{" "}
+            <Usercard {...activeUser} />
           </>
         ) : (
           <div></div>

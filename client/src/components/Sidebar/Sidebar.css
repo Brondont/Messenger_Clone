@@ -1,10 +1,13 @@
 .main_sidebar {
-  margin-top: -15px;
   padding-left: 10px;
   display: flex;
   flex-direction: column;
   width: 500px;
   height: 100%;
+}
+
+.main_sidebar h1 {
+  margin-top: 5;
 }
 
 .user_messages {

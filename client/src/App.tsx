@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
+import { AuthContext } from "./authContext";
+
 import Home from "./pages/main/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
@@ -64,7 +66,9 @@ const App: React.FC = () => {
       ));
   return (
     <div className="main">
-      <Routes>{routes}</Routes>
+      <AuthContext.Provider value={{ logoutHandler }}>
+        <Routes>{routes}</Routes>
+      </AuthContext.Provider>
     </div>
   );
 };
