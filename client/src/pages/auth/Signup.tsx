@@ -9,17 +9,9 @@ const Singup: React.FC = () => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-    const gender = formData.get("gender") as string;
-
     fetch(rooturl + "/signup", {
       method: "POST",
-      body: JSON.stringify({ email, username, password, gender }),
-      headers: {
-        "Content-type": "application/json",
-      },
+      body: formData,
     })
       .then((res) => {
         return res.json();
@@ -47,7 +39,10 @@ const Singup: React.FC = () => {
         <button type="submit"> Continue </button>
       </form>
       <p>
-        Already have an account ? <Link to="/login">Sign in here</Link>
+        Already have an account ?{" "}
+        <Link to="/login">
+          <b>Sign in here</b>
+        </Link>
       </p>
     </section>
   );

@@ -8,14 +8,14 @@ import Usercard from "../Usercard/Usercard";
 type User = {
   id: string;
   username: string;
-  email: string;
   imagePath: string;
   gender: string;
 };
 
 type UserMessage = {
-  createdAt: string;
-  sender_id: string;
+  id: number;
+  createdAt: number;
+  sender_id: number;
   message: string;
   sentOn: string;
 };
@@ -24,7 +24,6 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
-  const [clientUser, setClientUser] = useState<User>();
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
   const rooturl = process.env.REACT_APP_ROOT_URL || "";
@@ -120,13 +119,16 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           .reverse()
           .map((message) => {
             return message.sender_id.toString() === userId ? (
-              <div className="main_chat__user_message_client_container">
+              <div
+                className="main_chat__user_message_client_container"
+                key={message.id}
+              >
                 <div className="main_chat__user_message_client">
                   {message.message}
                 </div>
               </div>
             ) : (
-              <div className="main_chat__user_message_server">
+              <div className="main_chat__user_message_server" key={message.id}>
                 {message.message}
               </div>
             );

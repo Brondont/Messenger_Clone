@@ -7,11 +7,23 @@ import { AuthContext } from "./authContext";
 import Home from "./pages/main/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import EditProfile from "./pages/auth/EditProfile";
+
+type User = {
+  id: string;
+  username: string;
+  imagePath: string;
+  gender: string;
+};
 
 const App: React.FC = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [token, setToken] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [clientUser, setClientUser] = useState<User>();
+
+  const rooturl = process.env.REACT_APP_ROOT_URL;
 
   const setUserLogin = (userId: string, token: string) => {
     setToken(token);
@@ -41,15 +53,41 @@ const App: React.FC = () => {
     }
 
     setUserLogin(storedUserId, token);
-  });
+
+    if (!userId) {
+      return;
+    }
+    fetch(rooturl + "/userContacts/" + userId, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        return setUsers(
+          resData.users.map((user: User) => {
+            if (user.id.toString() === userId) {
+              setClientUser(user);
+            }
+            return { ...user, imagePath: rooturl + user.imagePath };
+          })
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [isAuth]);
 
   let routes;
   isAuth
     ? (routes = (
         <>
+          <Route path="/m/:receiverId" element={<Home Users={users} />}></Route>
           <Route
-            path="/m/:receiverId"
-            element={<Home userId={userId} token={token} />}
+            path="edit-profile"
+            element={<EditProfile User={clientUser} />}
           ></Route>
           <Route path="*" element={<Navigate to={"/m/" + userId} />} />
         </>
@@ -57,10 +95,10 @@ const App: React.FC = () => {
     : (routes = (
         <>
           <Route
-            path="login"
+            path="/login"
             element={<Login setUserLogin={setUserLogin} />}
           ></Route>
-          <Route path="signup" element={<Signup />}></Route>
+          <Route path="/signup" element={<Signup />}></Route>
           <Route path="*" element={<Navigate to="/login" />} />
         </>
       ));

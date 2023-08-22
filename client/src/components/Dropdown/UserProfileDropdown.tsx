@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import "./UserProfileDropdown.css";
 import LogoutIcon from "../../public/images/logout.png";
 import UserSettingsIcon from "../../public/images/profile-settings.png";
@@ -10,7 +11,6 @@ import Usercard from "../Usercard/Usercard";
 type User = {
   id: string;
   username: string;
-  email: string;
   imagePath: string;
   gender: string;
 };
@@ -32,14 +32,17 @@ const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
     <div className="user-profile-dropdown">
       {isOpen && (
         <div className="dropdown-content">
-          <div className="dropdown-item-button" onClick={handleProfileSettings}>
+          <Link
+            className="dropdown-item-button"
+            to={{ pathname: "/edit-profile/" }}
+          >
             <img
               src={UserSettingsIcon}
               className="dropdown-item-icon"
               placeholder="settings"
             />
             <div className="dropdown-item-text">Profile Settings</div>
-          </div>
+          </Link>
           <div className="dropdown-item-button" onClick={logoutHandler}>
             <img
               src={LogoutIcon}

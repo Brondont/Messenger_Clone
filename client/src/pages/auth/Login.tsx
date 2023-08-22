@@ -52,7 +52,10 @@ const Login: React.FC<{
         <button type="submit"> Continue </button>
       </form>
       <p>
-        Don't have an account? <Link to="/signup">Sign up here</Link>
+        Don't have an account?{" "}
+        <Link to="/signup">
+          <b>Sign up here</b>
+        </Link>
       </p>
     </section>
   );

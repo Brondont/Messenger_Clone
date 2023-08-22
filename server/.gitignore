@@ -1,0 +1,10 @@
+node_modules/
+nodemon.json
+*.log
+.env
+
+# Ignore the contents of the images and data directories
+images/*
+!images/.gitignore
+data/*
+!data/.gitignore

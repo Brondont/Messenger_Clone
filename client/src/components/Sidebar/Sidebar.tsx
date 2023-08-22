@@ -8,7 +8,6 @@ import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
 type User = {
   id: string;
   username: string;
-  email: string;
   imagePath: string;
   gender: string;
 };

@@ -4,6 +4,7 @@ const { check } = require("express-validator");
 const router = express.Router();
 
 const authControllers = require("../controllers/auth");
+const isAuth = require("../middleware/is-auth");
 
 router.post("/login", authControllers.postLogin);
 
@@ -19,6 +20,17 @@ router.post(
       .withMessage("Password must be at least 6 characters long."),
   ],
   authControllers.postSignup
+);
+
+router.put(
+  "/signup",
+  [
+    check("username")
+      .isLength({ min: 1 })
+      .withMessage("Username not submitted"),
+  ],
+  isAuth,
+  authControllers.putSignup
 );
 
 module.exports = router;

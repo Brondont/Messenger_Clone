@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
+const { clearImage } = require("../util/file");
+
 exports.postLogin = (req, res, next) => {
   const { email, password } = req.body;
   let user;
@@ -89,5 +91,50 @@ exports.postSignup = (req, res, next) => {
         err.statusCode = 500;
       }
       return next(err);
+    });
+};
+
+exports.putSignup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed");
+    error.statusCode = 422;
+    throw error;
+  }
+  const username = req.body.username;
+  const gender = req.body.gender;
+  let imagePath = req.body.oldPath;
+  if (req.file) {
+    imagePath = req.file.path;
+  }
+  User.findByPk(req.userId)
+    .then((user) => {
+      if (!user) {
+        const error = new Error("User not found!");
+        error.statusCode = 404;
+        throw error;
+      }
+      if (user.id.toString() != req.userId) {
+        const error = new Error("Validation failed.");
+        error.statusCode = 403;
+        throw error;
+      }
+      if (
+        imagePath !== "/default-profile-pictures/male-pfp.jpg" &&
+        imagePath !== "/default-profile-pictures/female-pfp.jpg" &&
+        imagePath !== user.imagePath
+      ) {
+        clearImage(user.imagePath);
+      }
+      user.username = username;
+      user.gender = gender;
+      user.imagePath = "/" + imagePath.replace("\\", "/");
+      return user.save();
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
