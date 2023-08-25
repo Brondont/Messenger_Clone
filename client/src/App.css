@@ -16,3 +16,29 @@ a:active {
   color: black;
   text-decoration: none;
 }
+
+.close_button {
+  right: 32px;
+  top: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.3;
+}
+.close_button:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+.close_button:before,
+.close_button:after {
+  left: 15px;
+  content: " ";
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close_button:before {
+  transform: rotate(45deg);
+}
+.close_button:after {
+  transform: rotate(-45deg);
+}

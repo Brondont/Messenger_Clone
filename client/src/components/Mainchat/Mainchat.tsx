@@ -15,7 +15,7 @@ type User = {
 type UserMessage = {
   id: number;
   createdAt: number;
-  sender_id: number;
+  senderId: number;
   message: string;
   sentOn: string;
 };
@@ -102,37 +102,64 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
         console.log(err);
       });
   };
+
+  let prevSenderId: number | null = null;
+
   return (
     <div className="main_chat">
       <div className="main_chat__user">
         {activeUser ? (
           <>
-            <Usercard {...activeUser} />
+            <Usercard user={activeUser} />
           </>
         ) : (
-          <div></div>
+          <div> Loading user...</div>
         )}
       </div>
       <div className="main_chat__user_messages">
-        {messages
-          .slice(0)
-          .reverse()
-          .map((message) => {
-            return message.sender_id.toString() === userId ? (
-              <div
-                className="main_chat__user_message_client_container"
-                key={message.id}
-              >
-                <div className="main_chat__user_message_client">
-                  {message.message}
-                </div>
-              </div>
-            ) : (
-              <div className="main_chat__user_message_server" key={message.id}>
-                {message.message}
-              </div>
-            );
-          })}
+        {activeUser ? (
+          <>
+            {messages
+              .slice(0)
+              .reverse()
+              .map((message) => {
+                const isCurrentUser = message.senderId.toString() === userId;
+                const showSenderName = prevSenderId !== message.senderId;
+
+                if (showSenderName) {
+                  prevSenderId = message.senderId;
+                }
+
+                return (
+                  <div
+                    className={`main_chat__user_message_${
+                      isCurrentUser ? "client" : "server"
+                    }_container`}
+                    key={message.id}
+                  >
+                    {showSenderName && (
+                      <p
+                        className={`message_${
+                          isCurrentUser ? "client" : "server"
+                        }__name`}
+                      >
+                        {isCurrentUser ? "You" : activeUser.username}
+                      </p>
+                    )}
+                    <div
+                      className={`main_chat__user_message_${
+                        isCurrentUser ? "client" : "server"
+                      }`}
+                    >
+                      {message.message}
+                    </div>
+                  </div>
+                );
+              })}
+          </>
+        ) : (
+          <div>Loading messages...</div>
+        )}
       </div>
       <div className="main_chat__user_input">
         <form onSubmit={sendUserMessage}>

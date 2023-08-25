@@ -38,10 +38,23 @@
 
 .main_chat__user_message_client_container {
   display: flex;
-  justify-content: right;
-  margin: 0;
+  flex-direction: column;
   padding: 0;
+}
+
+.main_chat__user_message_server_container {
+  flex-direction: column;
+}
+
+.message_client__name {
+  text-align: right;
+  margin: 0;
   margin-right: 5px;
+}
+
+.message_server__name {
+  margin: 0;
+  margin-left: 2px;
 }
 
 .main_chat__user_message_server,
@@ -54,18 +67,20 @@
   min-width: 20px;
   word-wrap: break-word;
   border-radius: 10px;
-  padding: 10px;
+  padding: 15px;
   margin: 2px;
 }
 
 .main_chat__user_message_server {
-  margin-bottom: 4px;
   background-color: var(--niceGray);
+  margin-left: 10px;
 }
 
 .main_chat__user_message_client {
   color: white;
+  margin-left: auto;
   background-color: rgb(0, 132, 255);
+  margin-right: 10px;
 }
 
 .main_chat__user {

@@ -7,10 +7,12 @@
 
 .dropdown-content {
   margin-top: -110px;
+  z-index: 1;
   display: grid;
   border-radius: 5px;
   padding: 5px;
   width: 300px;
+  background-color: white;
   height: 100px;
   box-shadow: 5px -1px 10px #d2d2d2, -5px 1px 10px #d2d2d2;
 }
@@ -24,6 +26,7 @@
   border: 0px;
 }
 .dropdown-toggle {
+  background-color: white;
   border: 0px;
 }
 

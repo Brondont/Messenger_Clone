@@ -1,0 +1,52 @@
+.notifications-icon {
+  width: 35px;
+  height: 35px;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-icon:hover {
+  background-color: var(--niceGray);
+  cursor: pointer;
+  border-radius: 100px;
+}
+
+.notifications-image {
+  width: 25px;
+  height: 25px;
+}
+
+.notifications {
+  z-index: 2;
+  position: absolute;
+  width: 20%;
+  max-height: 50%;
+  height: 100%;
+  margin-bottom: 400px;
+  padding: 10px;
+  overflow: none;
+  overflow-y: auto;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  box-shadow: 5px -1px 10px #d2d2d2, -5px 1px 10px #d2d2d2;
+}
+
+.notifications-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.notifications-item {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: white;
+  border: 0px;
+}

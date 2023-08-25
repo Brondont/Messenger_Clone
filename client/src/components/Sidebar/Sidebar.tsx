@@ -4,6 +4,8 @@ import "./SideBar.css";
 
 import Usercard from "../Usercard/Usercard";
 import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
+import Notifications from "../Notifications/Notifications";
+import UserSearch from "../UserSearch/UserSearch";
 
 type User = {
   id: string;
@@ -25,17 +27,23 @@ const SideBar: React.FC<{
 
   return (
     <div className="main_sidebar">
-      <h1> Chats </h1>
+      <div className="main_top">
+        <h1> Chats </h1>
+        <UserSearch />
+      </div>
       <div className="user_messages">
         {Users.map((user: User) => {
           return (
             <Link to={"/m/" + user.id} key={user.id}>
-              <Usercard key={user.id} {...user} />
+              <Usercard key={user.id} user={user} />
             </Link>
           );
         })}
       </div>
-      <UserProfileDropdown User={clientUser} />
+      <div className="main_bottom">
+        <UserProfileDropdown User={clientUser} />
+        <Notifications />
+      </div>
     </div>
   );
 };

@@ -66,12 +66,13 @@ const App: React.FC = () => {
         return res.json();
       })
       .then((resData) => {
+        console.log(resData);
         return setUsers(
           resData.users.map((user: User) => {
             if (user.id.toString() === userId) {
               setClientUser(user);
             }
-            return { ...user, imagePath: rooturl + user.imagePath };
+            return { ...user };
           })
         );
       })

@@ -5,6 +5,8 @@
   margin-top: 8px;
   margin-bottom: 8px;
   border-radius: 5px;
+  background-color: white;
+  padding: 5px;
 }
 
 .user_card:hover {
@@ -21,4 +23,22 @@
 
 .user_card__username {
   font-weight: 600;
+}
+
+.add-friend button {
+  z-index: 999;
+  border: 0px;
+  background: #0a7cff;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 14px;
+  width: 90px;
+  height: 35px;
+  margin-left: 90px;
+}
+
+.add-friend button:hover {
+  z-index: 999;
+  background: #4592eb;
+  cursor: pointer;
 }

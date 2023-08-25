@@ -54,7 +54,7 @@ const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
         </div>
       )}
       <button className="dropdown-toggle" onClick={handleToggleDropdown}>
-        <Usercard {...User!} />{" "}
+        <Usercard user={User} />
       </button>
     </div>
   );

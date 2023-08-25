@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const db = require("./util/database");
 const User = require("./models/user");
 const Message = require("./models/message");
+const Friend = require("./models/friend");
 
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
@@ -48,10 +49,12 @@ app.use((error, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-User.hasMany(Message, { as: "ReceivedMessages", foreignKey: "receiver_id" });
-Message.belongsTo(User, { as: "Receiver", foreignKey: "receiver_id" });
-User.hasMany(Message, { as: "SentMessages", foreignKey: "sender_id" });
-Message.belongsTo(User, { as: "Sender", foreignKey: "sender_id" });
+User.hasMany(Message, { as: "ReceivedMessages", foreignKey: "receiverId" });
+Message.belongsTo(User, { as: "Receiver", foreignKey: "receiverId" });
+User.hasMany(Message, { as: "SentMessages", foreignKey: "senderId" });
+Message.belongsTo(User, { as: "Sender", foreignKey: "senderId" });
+User.hasMany(Friend, { as: "FriendRequest", foreignKey: "userId" });
+Friend.belongsTo(User, { as: "FriendReply", foreignKey: "friendId" });
 
 db.sync()
   .then(() => {

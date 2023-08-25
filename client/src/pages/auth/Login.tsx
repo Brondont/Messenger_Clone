@@ -16,10 +16,7 @@ const Login: React.FC<{
 
     fetch(rooturl + "/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
-      headers: {
-        "Content-type": "application/json",
-      },
+      body: formData,
     })
       .then((res) => {
         return res.json();
