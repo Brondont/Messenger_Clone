@@ -9,6 +9,7 @@ const db = require("./util/database");
 const User = require("./models/user");
 const Message = require("./models/message");
 const Friend = require("./models/friend");
+const Notification = require("./models/notification");
 
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
@@ -44,8 +45,8 @@ app.use(authRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
-  const status = error.status || 500;
-  const message = error.message;
+  const status = error.statusCode || 500;
+  const message = error;
   res.status(status).json({ error: message });
 });
 
@@ -53,8 +54,10 @@ User.hasMany(Message, { as: "ReceivedMessages", foreignKey: "receiverId" });
 Message.belongsTo(User, { as: "Receiver", foreignKey: "receiverId" });
 User.hasMany(Message, { as: "SentMessages", foreignKey: "senderId" });
 Message.belongsTo(User, { as: "Sender", foreignKey: "senderId" });
-User.hasMany(Friend, { as: "FriendRequest", foreignKey: "userId" });
-Friend.belongsTo(User, { as: "FriendReply", foreignKey: "friendId" });
+User.hasMany(Friend, { as: "FriendRequest", foreignKey: "userId1" });
+Friend.belongsTo(User, { as: "FriendReply", foreignKey: "userId2" });
+User.hasMany(Notification, { as: "Notified", foreignKey: "notifiedId" });
+Notification.belongsTo(User, { as: "Notifier", foreignKey: "notifierId" });
 
 db.sync()
   .then(() => {

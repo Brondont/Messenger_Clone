@@ -57,7 +57,8 @@ const App: React.FC = () => {
     if (!userId) {
       return;
     }
-    fetch(rooturl + "/userContacts/" + userId, {
+
+    fetch(rooturl + "/userContacts", {
       headers: {
         Authorization: "Bearer " + token,
       },

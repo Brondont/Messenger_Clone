@@ -27,7 +27,7 @@ exports.postLogin = (req, res, next) => {
         throw error;
       }
       const token = jwt.sign(
-        { userId: user.id.toString() },
+        { userId: user.id.toString(), username: user.username },
         process.env.JWT_SECRET,
         {
           expiresIn: "12h",

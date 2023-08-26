@@ -9,12 +9,18 @@ route.get("/m/:receiverId", isAuth, userControllers.getUserMessages);
 
 route.post("/send-message", isAuth, userControllers.postUserMessage);
 
-route.get("/userContacts/:userId", isAuth, userControllers.getContacts);
+route.get("/userContacts/", isAuth, userControllers.getUserContacts);
 
 route.get("/usersSearch/:userName", isAuth, userControllers.getUsersSearched);
 
 route.post("/addFriend/:friendId", isAuth, userControllers.postAddFriend);
 
-route.put("/addFriend/:");
+route.put("/addFriend/:notifierId", isAuth, userControllers.putFriendRequest);
+
+route.get(
+  "/notifications/:notifiedId",
+  isAuth,
+  userControllers.getUserNotifications
+);
 
 module.exports = route;

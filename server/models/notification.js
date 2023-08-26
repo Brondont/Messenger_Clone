@@ -2,20 +2,25 @@ const Sequelize = require("sequelize");
 
 const sequelize = require("../util/database");
 
-const Friend = sequelize.define("friend", {
+const Notification = sequelize.define("notification", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true,
   },
-  confirmedAt: {
-    type: Sequelize.DATE,
-  },
   type: {
     type: Sequelize.STRING,
-    allowNuLL: false,
+    allowNull: false,
+  },
+  desc: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+  seen: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
   },
 });
 
-module.exports = Friend;
+module.exports = Notification;
