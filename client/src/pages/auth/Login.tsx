@@ -6,7 +6,6 @@ import "./Auth.css";
 import Input from "../../components/Form/Input/Input";
 import { isRequired, isEmail, isLength } from "../../util/validators";
 import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
-import { setegid } from "process";
 
 export type ErrorServerResponse = {
   type: string;
@@ -42,11 +41,13 @@ const Login: React.FC<{
     },
   });
 
+  const rooturl = process.env.REACT_APP_ROOT_URL;
+
   const inputChangeHandler = (value: string, name: string) => {
     setLoginForm((prevState: LoginForm) => {
       const fieldConfig = prevState[name];
       let isValid = true;
-      fieldConfig.validators.map((validator) => {
+      fieldConfig.validators.map((validator: ValidatorFunction) => {
         isValid = isValid && validator(value);
       });
       const updatedForm = {
@@ -61,13 +62,13 @@ const Login: React.FC<{
     });
   };
 
-  const rooturl = process.env.REACT_APP_ROOT_URL;
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) {
       return;
     }
     setIsloading(true);
+    setErrorMessages([]);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -82,9 +83,6 @@ const Login: React.FC<{
       })
       .then((resData) => {
         if (resData.error) {
-          if (resData.error.statusCode === 500) {
-            throw resData.error;
-          }
           if (
             resData.error.statusCode === 422 ||
             resData.error.statusCode === 401 ||
@@ -106,6 +104,8 @@ const Login: React.FC<{
             });
             setIsloading(false);
             return;
+          } else {
+            throw resData.error;
           }
         }
         setUserLogin(resData.userId, resData.token);
@@ -121,7 +121,7 @@ const Login: React.FC<{
       })
       .catch((err) => {
         setIsloading(false);
-        throw err;
+        console.log("some unexpected error occured: ", err);
       });
   };
   return (
@@ -136,6 +136,7 @@ const Login: React.FC<{
           onChange={inputChangeHandler}
           errorMessage={errorMessage}
           valid={loginForm.email.valid}
+          value={loginForm.email.value}
           required={true}
         />
         <Input
@@ -145,6 +146,7 @@ const Login: React.FC<{
           onChange={inputChangeHandler}
           errorMessage={errorMessage}
           valid={loginForm.password.valid}
+          value={loginForm.password.value}
           required={true}
         />
         <button type="submit"> Continue </button>

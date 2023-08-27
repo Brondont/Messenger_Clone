@@ -24,6 +24,7 @@ type InputProps = {
 const Input: React.FC<InputProps> = ({
   valid,
   required,
+  value,
   placeholder,
   type,
   name,
@@ -53,6 +54,7 @@ const Input: React.FC<InputProps> = ({
         placeholder={placeholder}
         name={name}
         type={type}
+        value={value}
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           onChange(e.currentTarget.value, name);
         }}

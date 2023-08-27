@@ -85,6 +85,11 @@ exports.postSignup = (req, res, next) => {
   }
 
   const { username, email, password, gender } = req.body;
+  if (gender !== "male" || gender !== "female") {
+    const error = new Error("Invalid input");
+    error.statusMessage = 403;
+    throw error;
+  }
   const imagePath =
     gender === "male"
       ? "/default-profile-pictures/male-pfp.jpg"
@@ -93,6 +98,15 @@ exports.postSignup = (req, res, next) => {
     .then((userDoc) => {
       if (userDoc) {
         const error = new Error("User with this email already exists.");
+        error.data = [
+          {
+            type: "invalid",
+            value: email,
+            msg: "User with this email already exists.",
+            path: "email",
+            location: "body",
+          },
+        ];
         error.statusCode = 409;
         throw error;
       }

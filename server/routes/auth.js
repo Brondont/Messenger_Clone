@@ -22,7 +22,7 @@ router.post(
   [
     check("email").isEmail().withMessage("Invalid E-mail submitted"),
     check("username")
-      .isLength({ min: 1 })
+      .isLength({ min: 2 })
       .withMessage("Username not submitted"),
     check("password")
       .isLength({ min: 5 })
