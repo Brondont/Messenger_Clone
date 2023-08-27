@@ -13,9 +13,9 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
   const navigate = useNavigate();
   const rooturl = process.env.REACT_APP_ROOT_URL;
   const token = localStorage.getItem("token");
+
   const handleProfileEdit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
     formData.append("oldPath", User!.imagePath);
 
@@ -30,11 +30,9 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
         return res.json();
       })
       .then((resData) => {
-        if (resData.message !== "Input validation failed") {
-          console.log("here");
-          throw new Error(resData.message);
+        if (resData.error) {
+          throw new Error(resData.error);
         }
-        console.log("here");
         navigate("/m/" + User!.id);
       })
       .catch((err) => {

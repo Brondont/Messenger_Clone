@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ErrorBoundary } from "react-error-boundary";
 import "./App.css";
 
 import { AuthContext } from "./authContext";
@@ -67,7 +68,6 @@ const App: React.FC = () => {
         return res.json();
       })
       .then((resData) => {
-        console.log(resData);
         return setUsers(
           resData.users.map((user: User) => {
             if (user.id.toString() === userId) {
@@ -106,9 +106,18 @@ const App: React.FC = () => {
       ));
   return (
     <div className="main">
-      <AuthContext.Provider value={{ logoutHandler }}>
-        <Routes>{routes}</Routes>
-      </AuthContext.Provider>
+      <ErrorBoundary
+        fallbackRender={({ error, resetErrorBoundary }) => (
+          <div className="error">
+            <p>{error.message}</p>
+            <button onClick={resetErrorBoundary}>Try again</button>
+          </div>
+        )}
+      >
+        <AuthContext.Provider value={{ logoutHandler }}>
+          <Routes>{routes}</Routes>
+        </AuthContext.Provider>
+      </ErrorBoundary>
     </div>
   );
 };

@@ -8,12 +8,30 @@ const User = require("../models/user");
 const { clearImage } = require("../util/file");
 
 exports.postLogin = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const error = new Error("Input validation failed");
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error;
+  }
+
   const { email, password } = req.body;
   let user;
   User.findOne({ where: { email } })
     .then((userDoc) => {
       if (!userDoc) {
         const error = new Error("User with this email does not exist.");
+        error.data = [
+          {
+            type: "Invalid",
+            value: email,
+            msg: "E-mail doesn't exist",
+            path: "email",
+            location: "body",
+          },
+        ];
         error.statusCode = 404;
         throw error;
       }
@@ -23,6 +41,15 @@ exports.postLogin = (req, res, next) => {
     .then((isCorrect) => {
       if (!isCorrect) {
         const error = new Error("User password is incorrect.");
+        error.data = [
+          {
+            type: "invalid",
+            value: password,
+            msg: "User password incorrect.",
+            path: "password",
+            location: "body",
+          },
+        ];
         error.statusCode = 401;
         throw error;
       }
@@ -105,7 +132,7 @@ exports.putSignup = (req, res, next) => {
   const gender = req.body.gender;
   let imagePath = req.body.oldPath;
   if (req.file) {
-    imagePath = req.file.path;
+    imagePath = "/" + req.file.path;
   }
   User.findByPk(req.userId)
     .then((user) => {
@@ -128,8 +155,11 @@ exports.putSignup = (req, res, next) => {
       }
       user.username = username;
       user.gender = gender;
-      user.imagePath = "/" + imagePath.replace("\\", "/");
+      user.imagePath = imagePath.replace("\\", "/");
       return user.save();
+    })
+    .then(() => {
+      return res.status(201).json({ message: "Profile updated." });
     })
     .catch((err) => {
       if (!err.statusCode) {

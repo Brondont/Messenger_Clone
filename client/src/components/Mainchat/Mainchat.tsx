@@ -96,7 +96,6 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
       })
       .then((resData) => {
         setUserMessage("");
-        console.log(resData);
       })
       .catch((err) => {
         console.log(err);

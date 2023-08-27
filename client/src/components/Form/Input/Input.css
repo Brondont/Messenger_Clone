@@ -1,0 +1,14 @@
+.input {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+}
+
+.invalid {
+  border-color: red;
+  background: #fce4e4;
+}
+
+.error {
+  color: red;
+}
