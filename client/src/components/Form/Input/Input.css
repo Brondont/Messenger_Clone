@@ -1,6 +1,7 @@
 .input {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: left;
 }
 
@@ -11,4 +12,10 @@
 
 .error {
   color: red;
+}
+
+label {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 20px;
 }

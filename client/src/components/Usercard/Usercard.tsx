@@ -13,9 +13,10 @@ type UserCardProps = {
   options?: {
     isAddFriend: boolean;
   };
+  onClick?: () => void;
 };
 
-const Usercard: React.FC<UserCardProps> = ({ user, options }) => {
+const Usercard: React.FC<UserCardProps> = ({ user, options, onClick }) => {
   const token = localStorage.getItem("token");
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
@@ -41,7 +42,7 @@ const Usercard: React.FC<UserCardProps> = ({ user, options }) => {
   };
 
   return (
-    <div className="user_card">
+    <div className="user_card" onClick={onClick}>
       {user ? (
         <>
           <img
@@ -50,12 +51,11 @@ const Usercard: React.FC<UserCardProps> = ({ user, options }) => {
             src={rooturl + user.imagePath}
           />
           <span className="user_card__username">{user.username}</span>
-          {options &&
-            options.isAddFriend && (
-              <div className="add-friend">
-                <button onClick={handleAddFriend}>Add Friend</button>
-              </div>
-            )}
+          {options && options.isAddFriend && (
+            <div className="add-friend">
+              <button onClick={handleAddFriend}>Add Friend</button>
+            </div>
+          )}
         </>
       ) : (
         <div> Loading user info... </div>

@@ -59,9 +59,3 @@ section {
   background: #4592eb;
   cursor: pointer;
 }
-
-.auth-form label {
-  font-weight: 600;
-  font-size: 18px;
-  margin-top: 20px;
-}

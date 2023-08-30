@@ -14,7 +14,7 @@ export type ErrorServerResponse = {
   location: string;
 };
 
-type SignupForm = {
+type Form = {
   [key: string]: {
     value: string;
     valid: boolean;
@@ -25,7 +25,7 @@ type SignupForm = {
 const Singup: React.FC = () => {
   const [errorMessage, setErrorMessages] = useState<ErrorServerResponse[]>([]);
   const [isLoading, setIsloading] = useState<boolean>(false);
-  const [signupForm, setSignupForm] = useState<SignupForm>({
+  const [signupForm, setSignupForm] = useState<Form>({
     email: {
       value: "",
       valid: true,
@@ -47,7 +47,7 @@ const Singup: React.FC = () => {
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
   const inputChangeHandler = (value: string, name: string) => {
-    setSignupForm((prevState: SignupForm) => {
+    setSignupForm((prevState: Form) => {
       const fieldConfig = prevState[name];
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {

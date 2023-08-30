@@ -137,8 +137,24 @@ exports.postSignup = (req, res, next) => {
 
 exports.putSignup = (req, res, next) => {
   const errors = validationResult(req);
+  if (req.fileValidationError) {
+    const error = new Error(req.fileValidationError);
+    error.data = [
+      {
+        type: "invalid",
+        value: "",
+        msg: "We only support jpeg/jpg/png files.",
+        path: "image",
+        location: "body",
+      },
+    ];
+    error.statusCode = 422;
+    throw error;
+  }
+
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed");
+    error.data = errors.array();
     error.statusCode = 422;
     throw error;
   }

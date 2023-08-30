@@ -15,7 +15,7 @@ export type ErrorServerResponse = {
   location: string;
 };
 
-type LoginForm = {
+type Form = {
   [key: string]: {
     value: string;
     valid: boolean;
@@ -28,7 +28,7 @@ const Login: React.FC<{
 }> = ({ setUserLogin }) => {
   const [errorMessage, setErrorMessages] = useState<ErrorServerResponse[]>([]);
   const [isLoading, setIsloading] = useState<boolean>(false);
-  const [loginForm, setLoginForm] = useState<LoginForm>({
+  const [loginForm, setLoginForm] = useState<Form>({
     email: {
       value: "",
       valid: true,
@@ -44,7 +44,7 @@ const Login: React.FC<{
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
   const inputChangeHandler = (value: string, name: string) => {
-    setLoginForm((prevState: LoginForm) => {
+    setLoginForm((prevState: Form) => {
       const fieldConfig = prevState[name];
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import "./App.css";
 
@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [clientUser, setClientUser] = useState<User>();
+  const location = useLocation();
 
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
@@ -52,12 +53,7 @@ const App: React.FC = () => {
       logoutHandler();
       return;
     }
-
     setUserLogin(storedUserId, token);
-
-    if (!userId) {
-      return;
-    }
 
     fetch(rooturl + "/userContacts", {
       headers: {
@@ -70,7 +66,7 @@ const App: React.FC = () => {
       .then((resData) => {
         return setUsers(
           resData.users.map((user: User) => {
-            if (user.id.toString() === userId) {
+            if (user.id.toString() === storedUserId) {
               setClientUser(user);
             }
             return { ...user };
@@ -80,7 +76,7 @@ const App: React.FC = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [isAuth]);
+  }, [location]);
 
   let routes;
   isAuth

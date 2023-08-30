@@ -21,15 +21,16 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, uuidv4());
+    cb(null, uuidv4() + "." + file.mimetype.split("/")[1]);
   },
 });
 
 const fileFilter = (req, file, cb) => {
   if (["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype)) {
-    cb(null, true);
+    return cb(null, true);
   } else {
-    cb(null, false);
+    req.fileValidationError = "Forbidden extension";
+    return cb(null, false);
   }
 };
 

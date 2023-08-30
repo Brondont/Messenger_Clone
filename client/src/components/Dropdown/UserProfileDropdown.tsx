@@ -24,8 +24,6 @@ const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleProfileSettings = () => {};
-
   const { logoutHandler } = useContext(AuthContext) as AuthContextType;
 
   return (
@@ -53,9 +51,7 @@ const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
           </div>
         </div>
       )}
-      <button className="dropdown-toggle" onClick={handleToggleDropdown}>
-        <Usercard user={User} />
-      </button>
+      <Usercard user={User} onClick={handleToggleDropdown} />
     </div>
   );
 };
