@@ -9,7 +9,7 @@ import { AuthContext, AuthContextType } from "../../authContext";
 import Usercard from "../Usercard/Usercard";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;

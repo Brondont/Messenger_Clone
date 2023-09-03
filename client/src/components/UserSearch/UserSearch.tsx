@@ -4,7 +4,7 @@ import "./UserSearch.css";
 import UserCard from "../Usercard/Usercard";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;

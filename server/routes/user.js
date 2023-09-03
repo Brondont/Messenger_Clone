@@ -5,8 +5,6 @@ const route = express.Router();
 const userControllers = require("../controllers/user");
 const isAuth = require("../middleware/is-auth");
 
-route.get("/m/lastUserMessages", isAuth, userControllers.getUserLastMessages);
-
 route.get("/m/:receiverId", isAuth, userControllers.getUserMessages);
 
 route.post("/send-message", isAuth, userControllers.postUserMessage);

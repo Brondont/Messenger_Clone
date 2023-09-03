@@ -2,13 +2,23 @@ import React from "react";
 import "./Usercard.css";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;
 };
 
+type UserMessage = {
+  id: number;
+  createdAt: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  sentOn: string;
+};
+
 type UserCardProps = {
+  lastMessage?: UserMessage | undefined;
   user: User | undefined;
   options?: {
     isAddFriend: boolean;
@@ -16,7 +26,12 @@ type UserCardProps = {
   onClick?: () => void;
 };
 
-const Usercard: React.FC<UserCardProps> = ({ user, options, onClick }) => {
+const Usercard: React.FC<UserCardProps> = ({
+  user,
+  options,
+  onClick,
+  lastMessage,
+}) => {
   const token = localStorage.getItem("token");
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
@@ -50,7 +65,12 @@ const Usercard: React.FC<UserCardProps> = ({ user, options, onClick }) => {
             className="user_card__image"
             src={rooturl + user.imagePath}
           />
-          <span className="user_card__username">{user.username}</span>
+          <div className="user_card__main">
+            <span className="user_card__username">{user.username}</span>
+            {lastMessage && (
+              <div className="last-message"> {lastMessage.message} </div>
+            )}
+          </div>
           {options && options.isAddFriend && (
             <div className="add-friend">
               <button onClick={handleAddFriend}>Add Friend</button>

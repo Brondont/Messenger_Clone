@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { Socket } from "socket.io-client";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;

@@ -7,7 +7,7 @@ import { isRequired, isEmail, isLength } from "../../util/validators";
 import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;

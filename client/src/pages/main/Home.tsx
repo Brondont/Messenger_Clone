@@ -6,10 +6,21 @@ import SideBar from "../../components/Sidebar/SideBar";
 import MainChat from "../../components/Mainchat/MainChat";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;
+  ReceivedMessages: UserMessage[];
+  SentMessages: UserMessage[];
+};
+
+type UserMessage = {
+  id: number;
+  createdAt: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  sentOn: string;
 };
 
 type HomePageProps = {

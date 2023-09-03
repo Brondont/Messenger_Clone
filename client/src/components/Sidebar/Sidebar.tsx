@@ -10,10 +10,12 @@ import UserSearch from "../UserSearch/UserSearch";
 import { AuthContext, AuthContextType } from "../../authContext";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
   imagePath: string;
   gender: string;
+  ReceivedMessages: UserMessage[];
+  SentMessages: UserMessage[];
 };
 
 type UserMessage = {
@@ -28,7 +30,7 @@ type UserMessage = {
 const SideBar: React.FC<{
   Users: User[];
 }> = ({ Users = [] }) => {
-  const [lastUserMessages, setLastUserMessages] = useState<UserMessage[]>();
+  const [lastUserMessages, setLastUserMessages] = useState<UserMessage[]>([]);
 
   const { clientUser } = useContext(AuthContext) as AuthContextType;
   const userId = localStorage.getItem("userId");
@@ -39,20 +41,17 @@ const SideBar: React.FC<{
     if (!Users) {
       return;
     }
-    fetch(rooturl + "/m/lastUserMessages", {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((res) => {
-        return res.json();
+    setLastUserMessages(
+      Users.flatMap((user) => {
+        return user.ReceivedMessages.flatMap((receivedMessage) => {
+          return user.SentMessages.map((sentMessage) => {
+            return receivedMessage.id > sentMessage.id
+              ? receivedMessage
+              : sentMessage;
+          });
+        });
       })
-      .then((resData) => {
-        console.log(resData);
-      })
-      .catch((err) => {
-        throw err;
-      });
+    );
   }, [Users, rooturl, token]);
 
   return (
@@ -63,9 +62,14 @@ const SideBar: React.FC<{
       </div>
       <div className="user_messages">
         {Users.map((user: User) => {
+          let message = lastUserMessages.find((message) => {
+            return (
+              message.senderId === user.id || message.receiverId === user.id
+            );
+          });
           return (
             <Link to={"/m/" + user.id} key={user.id}>
-              <Usercard key={user.id} user={user} />
+              <Usercard key={user.id} user={user} lastMessage={message} />
             </Link>
           );
         })}

@@ -39,16 +39,6 @@ exports.getUserMessages = (req, res, next) => {
     });
 };
 
-exports.getUserLastMessages = (req, res, next) => {
-  const userId = req.userId;
-  Message.findAll({
-    where: {
-      [Op.or]: [{ senderId: userId }, { receiverId: userId }],
-    },
-    order: [["createdAt", "DESC"]],
-  }).then((messages) => {});
-};
-
 exports.postUserMessage = (req, res, next) => {
   const message = req.body.message;
   const receiverId = req.body.receiverId;
@@ -97,6 +87,26 @@ exports.getUserContacts = (req, res, next) => {
             return [friendRequest.userId1, friendRequest.userId2];
           }),
         },
+        include: [
+          {
+            model: Message,
+            as: "SentMessages",
+            limit: 1,
+            order: [["id", "DESC"]],
+            where: {
+              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+            },
+          },
+          {
+            model: Message,
+            as: "ReceivedMessages",
+            limit: 1,
+            order: [["id", "DESC"]],
+            where: {
+              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+            },
+          },
+        ],
       });
     })
     .then((users) => {
