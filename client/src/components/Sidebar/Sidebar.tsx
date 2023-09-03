@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SideBar.css";
 
@@ -7,6 +7,8 @@ import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
 import Notifications from "../Notifications/Notifications";
 import UserSearch from "../UserSearch/UserSearch";
 
+import { AuthContext, AuthContextType } from "../../authContext";
+
 type User = {
   id: string;
   username: string;
@@ -14,16 +16,44 @@ type User = {
   gender: string;
 };
 
+type UserMessage = {
+  id: number;
+  createdAt: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  sentOn: string;
+};
+
 const SideBar: React.FC<{
   Users: User[];
 }> = ({ Users = [] }) => {
-  const [clientUser, setClientUser] = useState<User>();
+  const [lastUserMessages, setLastUserMessages] = useState<UserMessage[]>();
 
+  const { clientUser } = useContext(AuthContext) as AuthContextType;
   const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const rooturl = process.env.REACT_APP_ROOT_URL;
 
   useEffect(() => {
-    setClientUser(Users.find((user) => user.id.toString() === userId));
-  }, [Users]);
+    if (!Users) {
+      return;
+    }
+    fetch(rooturl + "/m/lastUserMessages", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        console.log(resData);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }, [Users, rooturl, token]);
 
   return (
     <div className="main_sidebar">

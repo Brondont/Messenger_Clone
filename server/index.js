@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
 
 const db = require("./util/database");
 const User = require("./models/user");
@@ -68,6 +69,29 @@ db.sync()
     const io = require("./socket").init(server);
     io.on("connection", (socket) => {
       console.log("Client connected!");
+      const token = socket.handshake.query.token;
+
+      try {
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decodedToken) {
+          const error = new Error("Authentication failed.");
+          error.statusCode = 401;
+          throw error;
+        }
+        const userId = decodedToken.userId;
+
+        console.log("User connected");
+
+        socket.join(userId);
+
+        socket.on("disconnect", (result, result2) => {
+          console.log("Client disconnected!");
+          socket.leave(userId);
+        });
+      } catch (err) {
+        console.error("Authentication failed:", err);
+        socket.disconnect(true);
+      }
     });
   })
   .catch((err) => {

@@ -102,3 +102,12 @@
 .main_chat__user_name {
   font-weight: 600;
 }
+
+.user-no-friends {
+  color: gray;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}

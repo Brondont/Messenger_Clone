@@ -7,10 +7,14 @@ const Message = require("../models/message");
 const Friend = require("../models/friend");
 const Notification = require("../models/notification");
 
+const { handleError } = require("../util/error");
+
 exports.getUserMessages = (req, res, next) => {
   const receivingUserId = req.params.receiverId;
 
   Message.findAll({
+    order: [["id", "DESC"]],
+    limit: 30,
     attributes: ["message", "createdAt", "id", "senderId"],
     where: {
       [Op.or]: [
@@ -21,9 +25,9 @@ exports.getUserMessages = (req, res, next) => {
   })
     .then((messages) => {
       if (!messages) {
-        const error = new Error("No messages found");
-        error.statusCode = 404;
-        throw error;
+        handleError("No messages found", 404, [
+          { message: "No messages between users" },
+        ]);
       }
       return res.status(200).json({ messages });
     })
@@ -33,6 +37,16 @@ exports.getUserMessages = (req, res, next) => {
       }
       return next(err);
     });
+};
+
+exports.getUserLastMessages = (req, res, next) => {
+  const userId = req.userId;
+  Message.findAll({
+    where: {
+      [Op.or]: [{ senderId: userId }, { receiverId: userId }],
+    },
+    order: [["createdAt", "DESC"]],
+  }).then((messages) => {});
 };
 
 exports.postUserMessage = (req, res, next) => {
@@ -45,7 +59,13 @@ exports.postUserMessage = (req, res, next) => {
     senderId: req.userId,
   })
     .then((createdMessage) => {
-      io.getIO().emit("newMessage", createdMessage);
+      if (!createdMessage) {
+        handleError("Failed to create message", 500);
+      }
+      io.getIO()
+        .to(receiverId)
+        .to(req.userId)
+        .emit("newMessage", createdMessage);
       return res.status(201).json({ message: "Message sent succesfully !" });
     })
     .catch((err) => {
@@ -64,28 +84,24 @@ exports.getUserContacts = (req, res, next) => {
     },
   })
     .then((friendRequests) => {
+      if (friendRequests.length < 1) {
+        return User.findAll({
+          attributes: ["username", "id", "email", "gender", "imagePath"],
+          where: { id: req.userId },
+        });
+      }
       return User.findAll({
+        attributes: ["username", "id", "gender", "imagePath"],
         where: {
-          [Op.or]: [
-            {
-              id: friendRequests.map((friendrequest) => {
-                return friendrequest.userId1;
-              }),
-            },
-            {
-              id: friendRequests.map((friendrequest) => {
-                return friendrequest.userId2;
-              }),
-            },
-          ],
+          id: friendRequests.flatMap((friendRequest) => {
+            return [friendRequest.userId1, friendRequest.userId2];
+          }),
         },
       });
     })
     .then((users) => {
       if (!users) {
-        const error = new Error("No users found.");
-        error.statusCode = 404;
-        throw error;
+        handleError("No users found", 404);
       }
       return res.status(200).json({ users });
     })
@@ -109,9 +125,7 @@ exports.getUsersSearched = (req, res, next) => {
   })
     .then((users) => {
       if (!users) {
-        const error = new Error("No users found with this username");
-        error.statusCode = 404;
-        throw error;
+        handleError("No users found with this username", 404);
       }
       return res.status(200).json({ users });
     })
@@ -152,24 +166,21 @@ exports.postAddFriend = (req, res, next) => {
         let error;
         switch (friendRequest.type) {
           case "Pending": {
-            error = new Error("Friend request already exists.");
-            error.statusCode = 409;
-            throw error;
+            handleError("Friend request already exists", 409);
           }
           case "Blocked": {
-            error = new Error("You have been blocked by this user.");
-            error.statusCode = 403;
-            throw error;
+            handleError("You have been blocked by this user.", 403);
           }
           case "Accepted": {
-            error = new Error("You are already friends with this user.");
-            error.statusCode = 409;
-            throw error;
+            handleError("You are already friends with this user.", 409);
+          }
+          case "Rejected": {
+            friendRequest.type = "Pending";
+            friendRequest.confirmedAt = null;
+            return friendRequest.save();
           }
           default: {
-            error = new Error("Invalid friend request type");
-            error.statusCode = 400;
-            throw error;
+            handleError("Invalid friend request type", 400);
           }
         }
       } else {
@@ -178,9 +189,7 @@ exports.postAddFriend = (req, res, next) => {
     })
     .then((createdFriendRequest) => {
       if (!createdFriendRequest) {
-        const error = new Error("Failed to create friend request");
-        error.statusCode = 500;
-        throw error;
+        handleError("Failed to create friend request", 500);
       }
       return Notification.create({
         type: "Friendship",
@@ -192,11 +201,11 @@ exports.postAddFriend = (req, res, next) => {
     })
     .then((createdNotification) => {
       if (!createdNotification) {
-        const error = new Error("Failed to create notfication.");
-        error.statusCode = 500;
-        throw error;
+        handleError("Failed to create notification", 500);
       }
-      io.getIO().emit("notification", { createdNotification });
+      io.getIO()
+        .to(friendId.toString())
+        .emit("newFriendRequestNotif", createdNotification);
       return res
         .status(200)
         .json({ message: "friend request sent successfully" });
@@ -213,6 +222,7 @@ exports.putFriendRequest = (req, res, next) => {
   const notifierId = req.params.notifierId;
   const notifiedId = req.userId;
   const reply = req.body.reply;
+
   if (reply !== "Accept" && reply !== "Decline") {
     const error = new Error("Invalid action type committed");
     error.statusCode = 403;
@@ -234,9 +244,10 @@ exports.putFriendRequest = (req, res, next) => {
   Friend.findOne({ where: { userId1, userId2 } })
     .then((friendRequest) => {
       if (!friendRequest) {
-        const error = new Error("Friend request doesn't exist.");
-        error.statusCode = 404;
-        throw error;
+        handleError("Friend requst doesn't exist", 404);
+      }
+      if (friendRequest.confirmedAt) {
+        return friendRequest;
       }
       friendRequest.confirmedAt = new Date();
       reply === "Accept"
@@ -245,16 +256,67 @@ exports.putFriendRequest = (req, res, next) => {
       return friendRequest.save();
     })
     .then(() => {
-      return Notification.findOne({ where: { notifiedId, notifiedId } });
+      return Notification.findOne({
+        where: { notifiedId, notifierId, type: "Friendship" },
+        order: [["createdAt", "DESC"]],
+      });
     })
     .then((notification) => {
       if (!notification) {
-        const error = new Error("This notification doesn't exist");
-        error.statsuCode = 404;
-        throw error;
+        handleError("This notification doesn't exist", 404);
       }
       notification.seen = true;
       return notification.save();
+    })
+    .then(() => {
+      User.findAll({
+        where: { id: [notifiedId, notifierId] },
+        attributes: ["username", "id", "gender", "imagePath"],
+      })
+        .then((users) => {
+          if (!users) {
+            handleError("Notified user doesn't exist", 404);
+          }
+          let notifiedUser;
+          let notifyingUser;
+          users.map((user) => {
+            if (user.id.toString() === notifierId) {
+              notifyingUser = user;
+            } else {
+              notifiedUser = user;
+            }
+          });
+          if (reply === "Accept") {
+            io.getIO()
+              .to(notifyingUser.id.toString())
+              .emit("friendAccept", notifiedUser);
+            io.getIO()
+              .to(notifiedUser.id.toString())
+              .emit("friendAccept", notifyingUser);
+          }
+          return Notification.create({
+            type: "FriendshipReply",
+            desc:
+              reply === "Accept"
+                ? `${notifiedUser.username} Accepted ur friend request.`
+                : `${notifiedUser.username} Rejected ur friend request.`,
+            notifiedId: notifierId,
+            notifierId: notifiedId,
+            seen: false,
+          });
+        })
+        .then((createdNotification) => {
+          return io
+            .getIO()
+            .to(notifierId.toString())
+            .emit("friendshipReply", createdNotification);
+        })
+        .catch((err) => {
+          if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+        });
     })
     .catch((err) => {
       throw err;
@@ -263,14 +325,24 @@ exports.putFriendRequest = (req, res, next) => {
 
 exports.getUserNotifications = (req, res, next) => {
   const notifiedId = req.params.notifiedId;
+  if (req.userId !== notifiedId) {
+    const error = new Error("Unauthorized access");
+    error.statusCode = 403;
+    return next(error);
+  }
   Notification.findAll({ where: { notifiedId } })
     .then((notifications) => {
       if (!notifications) {
-        const error = new Error("No notifications found.");
-        error.statusCode = 404;
-        throw error;
+        handleError("No notifications found.", 404);
       }
-      return res.status(200).json({ notifications });
+      res.status(200).json({ notifications });
+      return notifications.forEach((notif) => {
+        if (notif.type === "Friendship") {
+          return notif;
+        }
+        notif.seen = true;
+        return notif.save();
+      });
     })
     .catch((err) => {
       if (!err.statusCode) {

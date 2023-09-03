@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Notifications.css";
 import NotifImage from "../../public/images/notification.png";
 
 import calculateTimeAgo from "../../util/timeAgo";
+import { AuthContext, AuthContextType } from "../../authContext";
 
 type Notification = {
   id: number;
@@ -18,17 +19,29 @@ type Notification = {
 const Notifications: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationsCount, setNotificationsCount] = useState<number>(0);
 
-  const rooturl = process.env.REACT_APP_ROOT_URL;
+  const rooturl = process.env.REACT_APP_ROOT_URL as string;
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const { socket } = useContext(AuthContext) as AuthContextType;
 
   const handleFriendResponse = (
     e: React.MouseEvent<HTMLDivElement>,
-    notifierId: string
+    notification: Notification
   ) => {
+    setNotifications((prevNotifs: Notification[]) => {
+      return prevNotifs.map((prevNotif: Notification) => {
+        if (prevNotif.id === notification.id) {
+          prevNotif.seen = true;
+        }
+        return prevNotif;
+      });
+    });
+
     const reply = (e.target as HTMLDivElement).innerHTML;
-    fetch(rooturl + "/addFriend/" + notifierId, {
+
+    fetch(rooturl + "/addFriend/" + notification.notifierId, {
       method: "PUT",
       body: JSON.stringify({ reply }),
       headers: {
@@ -44,7 +57,9 @@ const Notifications: React.FC = () => {
           console.log(resData);
         }
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
@@ -59,8 +74,43 @@ const Notifications: React.FC = () => {
           return;
         }
         setNotifications(resData.notifications);
+        setNotificationsCount(() => {
+          let count = 0;
+          resData.notifications.map((notif: Notification) => {
+            if (!notif.seen) {
+              count++;
+            }
+          });
+          return count;
+        });
       });
-  }, [isOpen, rooturl, userId, token]);
+    if (!socket) {
+      return;
+    }
+
+    socket.on("newFriendRequestNotif", (notification: Notification) => {
+      setNotifications((prevState) => {
+        return [...prevState, notification];
+      });
+      setNotificationsCount((prevState) => {
+        return prevState + 1;
+      });
+    });
+
+    socket.on("friendshipReply", (notification: Notification) => {
+      setNotifications((prevState) => {
+        return [...prevState, notification];
+      });
+      setNotificationsCount((prevState) => {
+        return prevState + 1;
+      });
+    });
+
+    return () => {
+      socket.off("newFriendRequestNotif");
+      socket.off("friendshipReply");
+    };
+  }, [isOpen, rooturl, userId, token, socket]);
 
   const handleToggleNotifcations = () => {
     setIsOpen(!isOpen);
@@ -70,6 +120,9 @@ const Notifications: React.FC = () => {
     <>
       <div className="notifications-icon" onClick={handleToggleNotifcations}>
         <img className="notifications-image" src={NotifImage} />
+        {notificationsCount > 0 && (
+          <span className="notifications-count"> {notificationsCount} </span>
+        )}
       </div>
       {isOpen && (
         <div className="notifications">
@@ -94,11 +147,7 @@ const Notifications: React.FC = () => {
                             <div
                               className="notifications-button accept"
                               onClick={(e) => {
-                                notification.seen = true;
-                                return handleFriendResponse(
-                                  e,
-                                  notification.notifierId.toString()
-                                );
+                                return handleFriendResponse(e, notification);
                               }}
                             >
                               Accept
@@ -106,17 +155,28 @@ const Notifications: React.FC = () => {
                             <div
                               className="notifications-button decline"
                               onClick={(e) => {
-                                notification.seen = true;
-                                return handleFriendResponse(
-                                  e,
-                                  notification.notifierId.toString()
-                                );
+                                return handleFriendResponse(e, notification);
                               }}
                             >
                               Decline
                             </div>
                           </>
                         )}
+                        <span>{calculateTimeAgo(notification.createdAt)}</span>
+                      </div>
+                    );
+                  } else if (notification.type === "FriendshipReply") {
+                    return (
+                      <div
+                        key={notification.id}
+                        className={
+                          notification.seen
+                            ? "notifications-item seen"
+                            : "notifications-item"
+                        }
+                      >
+                        <p>{notification.desc}</p>
+                        {notification.seen && <p> seen </p>}
                         <span>{calculateTimeAgo(notification.createdAt)}</span>
                       </div>
                     );

@@ -10,9 +10,9 @@
 }
 
 .usersearch-input {
-  width: 100%;
+  width: 85%;
   height: 30px;
-  border-radius: 10px px;
+  border-radius: 10px;
   border: 0px;
   padding-left: 5px;
   background-color: var(--niceGray);

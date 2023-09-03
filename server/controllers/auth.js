@@ -7,14 +7,13 @@ const User = require("../models/user");
 
 const { clearImage } = require("../util/file");
 
+const { handleError } = require("../util/error");
+
 exports.postLogin = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const error = new Error("Input validation failed");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
+    handleError("Input validation failed", 422, errors.array());
   }
 
   const { email, password } = req.body;
@@ -22,8 +21,7 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ where: { email } })
     .then((userDoc) => {
       if (!userDoc) {
-        const error = new Error("User with this email does not exist.");
-        error.data = [
+        handleError("User with this email does not exist.", 404, [
           {
             type: "Invalid",
             value: email,
@@ -31,17 +29,14 @@ exports.postLogin = (req, res, next) => {
             path: "email",
             location: "body",
           },
-        ];
-        error.statusCode = 404;
-        throw error;
+        ]);
       }
       user = userDoc;
       return bcrypt.compare(password, userDoc.password);
     })
     .then((isCorrect) => {
       if (!isCorrect) {
-        const error = new Error("User password is incorrect.");
-        error.data = [
+        handleError("User password is incorrect", 401, [
           {
             type: "invalid",
             value: password,
@@ -49,9 +44,7 @@ exports.postLogin = (req, res, next) => {
             path: "password",
             location: "body",
           },
-        ];
-        error.statusCode = 401;
-        throw error;
+        ]);
       }
       const token = jwt.sign(
         { userId: user.id.toString(), username: user.username },
@@ -78,17 +71,12 @@ exports.postSignup = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const error = new Error("Input validation failed");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
+    handleError("Input validation failed", 422, errors.array());
   }
 
   const { username, email, password, gender } = req.body;
-  if (gender !== "male" || gender !== "female") {
-    const error = new Error("Invalid input");
-    error.statusMessage = 403;
-    throw error;
+  if (gender !== "male" && gender !== "female") {
+    handleError("Invalid input", 403);
   }
   const imagePath =
     gender === "male"
@@ -97,8 +85,7 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ where: { email } })
     .then((userDoc) => {
       if (userDoc) {
-        const error = new Error("User with this email already exists.");
-        error.data = [
+        handleError("User with this email already exists.", 409, [
           {
             type: "invalid",
             value: email,
@@ -106,9 +93,7 @@ exports.postSignup = (req, res, next) => {
             path: "email",
             location: "body",
           },
-        ];
-        error.statusCode = 409;
-        throw error;
+        ]);
       }
       return bcrypt.hash(password, 12);
     })
@@ -137,9 +122,10 @@ exports.postSignup = (req, res, next) => {
 
 exports.putSignup = (req, res, next) => {
   const errors = validationResult(req);
+
   if (req.fileValidationError) {
-    const error = new Error(req.fileValidationError);
-    error.data = [
+    handleError(req, fileValidationError);
+    const error = new Error(req.fileValidationError, 422, [
       {
         type: "invalid",
         value: "",
@@ -147,16 +133,11 @@ exports.putSignup = (req, res, next) => {
         path: "image",
         location: "body",
       },
-    ];
-    error.statusCode = 422;
-    throw error;
+    ]);
   }
 
   if (!errors.isEmpty()) {
-    const error = new Error("Validation failed");
-    error.data = errors.array();
-    error.statusCode = 422;
-    throw error;
+    handleError("Validation failed", 422, errors.array());
   }
   const username = req.body.username;
   const gender = req.body.gender;
@@ -167,14 +148,10 @@ exports.putSignup = (req, res, next) => {
   User.findByPk(req.userId)
     .then((user) => {
       if (!user) {
-        const error = new Error("User not found!");
-        error.statusCode = 404;
-        throw error;
+        handleError("User not found.", 404);
       }
       if (user.id.toString() != req.userId) {
-        const error = new Error("Validation failed.");
-        error.statusCode = 403;
-        throw error;
+        handleError("Valiation failed", 403);
       }
       if (
         imagePath !== "/default-profile-pictures/male-pfp.jpg" &&
