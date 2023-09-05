@@ -15,7 +15,7 @@ exports.getUserMessages = (req, res, next) => {
   Message.findAll({
     order: [["id", "DESC"]],
     limit: 30,
-    attributes: ["message", "createdAt", "id", "senderId"],
+    attributes: ["message", "createdAt", "id", "senderId", "status"],
     where: {
       [Op.or]: [
         { senderId: receivingUserId, receiverId: req.userId }, // Messages from user1 to user2
@@ -29,7 +29,18 @@ exports.getUserMessages = (req, res, next) => {
           { message: "No messages between users" },
         ]);
       }
-      return res.status(200).json({ messages });
+      res.status(200).json({ messages });
+      io.getIO().to(receivingUserId).to(req.userId).emit("seenMessage", {
+        receiverId: req.userId,
+        senderId: receivingUserId, // have to flip them since the user that is making the request is the "sender" even tho he is the one that received the message
+      });
+      return messages.map((message) => {
+        if (message.senderId.toString() === req.userId) {
+          return message.save();
+        }
+        message.status = "seen";
+        return message.save();
+      });
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -46,6 +57,7 @@ exports.postUserMessage = (req, res, next) => {
   Message.create({
     message,
     receiverId: receiverId,
+    status: "sent",
     senderId: req.userId,
   })
     .then((createdMessage) => {

@@ -13,6 +13,10 @@ const Message = sequelize.define("message", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  status: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Message;

@@ -26,7 +26,7 @@ type UserMessage = {
   senderId: number;
   receiverId: number;
   message: string;
-  sentOn: string;
+  status: string;
 };
 
 const App: React.FC = () => {

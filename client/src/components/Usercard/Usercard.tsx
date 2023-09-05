@@ -1,6 +1,8 @@
 import React from "react";
 import "./Usercard.css";
 
+import calculateTimeAgo from "../../util/timeAgo";
+
 type User = {
   id: number;
   username: string;
@@ -14,7 +16,7 @@ type UserMessage = {
   senderId: number;
   receiverId: number;
   message: string;
-  sentOn: string;
+  status: string;
 };
 
 type UserCardProps = {
@@ -33,6 +35,7 @@ const Usercard: React.FC<UserCardProps> = ({
   lastMessage,
 }) => {
   const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
   const handleAddFriend = () => {
@@ -68,7 +71,20 @@ const Usercard: React.FC<UserCardProps> = ({
           <div className="user_card__main">
             <span className="user_card__username">{user.username}</span>
             {lastMessage && (
-              <div className="last-message"> {lastMessage.message} </div>
+              <>
+                <div
+                  className={
+                    lastMessage.status === "seen"
+                      ? "last-message"
+                      : "last-message active_message"
+                  }
+                >
+                  {(lastMessage.senderId.toString() === userId
+                    ? "You: "
+                    : user.username + ": ") + lastMessage.message}
+                </div>
+                <>{calculateTimeAgo(lastMessage.createdAt.toString())}</>
+              </>
             )}
           </div>
           {options && options.isAddFriend && (

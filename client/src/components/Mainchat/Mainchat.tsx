@@ -20,7 +20,7 @@ type UserMessage = {
   senderId: number;
   receiverId: number;
   message: string;
-  sentOn: string;
+  status: string;
 };
 
 const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
@@ -76,11 +76,26 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
         (userId === message.receiverId.toString() &&
           activeUserWindow === message.senderId.toString())
       ) {
-        console.log("this ran");
-        setMessages((prevMessages) => {
-          return [message, ...prevMessages];
+        setMessages((prevMessages: UserMessage[]) => {
+          return [
+            message,
+            ...prevMessages.map((message) => {
+              return { ...message, status: "seen" };
+            }),
+          ];
         });
       }
+    });
+
+    socket.on("seenMessage", () => {
+      setMessages((prevMessages: UserMessage[]) => {
+        return prevMessages.map((message: UserMessage) => {
+          if (message.senderId.toString() === activeUserWindow) {
+            return message;
+          }
+          return { ...message, status: "seen" };
+        });
+      });
     });
 
     return () => {
@@ -93,6 +108,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     if (!userMessage.length) {
       return;
     }
+
     const userMessageDetails = {
       message: userMessage,
       receiverId: activeUserWindow,
@@ -165,6 +181,9 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
                       >
                         {message.message}
                       </div>
+                      {showSenderName && isCurrentUser && (
+                        <div className="message__seen">{message.status}</div>
+                      )}
                     </div>
                   );
                 })}

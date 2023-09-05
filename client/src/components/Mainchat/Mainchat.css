@@ -57,14 +57,15 @@
   margin-left: 2px;
 }
 
+.message__seen {
+  text-align: right;
+}
+
 .main_chat__user_message_server,
 .main_chat__user_message_client {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: fit-content;
   max-width: 40%;
-  min-width: 20px;
   word-wrap: break-word;
   border-radius: 10px;
   padding: 15px;
