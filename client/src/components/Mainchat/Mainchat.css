@@ -112,3 +112,39 @@
   justify-content: center;
   height: 100%;
 }
+
+.main_chat__user_profile {
+  z-index: 999;
+  position: absolute;
+  width: fit-content;
+  overflow-x: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  margin-top: 150px;
+  border-radius: 10px;
+  box-shadow: 5px -1px 10px #d2d2d2, -5px 1px 10px #d2d2d2;
+}
+
+.main_chat__user-load-more {
+  display: flex;
+  align-self: center;
+  width: fit-content;
+  border: 1px solid rgb(168, 168, 168);
+  box-shadow: 5px -1px 10px #d2d2d2, -5px 1px 10px #d2d2d2;
+  border-radius: 10px;
+  padding: 5px;
+  margin: 8px;
+  background-color: var(--niceGray);
+}
+
+.main_chat__user-load-more:hover {
+  cursor: pointer;
+  background-color: rgb(206, 206, 206);
+}
+
+.main_chat__user-messages-start {
+  align-self: center;
+  color: gray;
+}

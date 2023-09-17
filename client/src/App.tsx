@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import socketIOClient, { Socket } from "socket.io-client";
 import { ErrorBoundary } from "react-error-boundary";
 import "./App.css";
@@ -10,6 +16,7 @@ import Home from "./pages/main/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import EditProfile from "./pages/auth/EditProfile";
+import ResetPassword from "./pages/auth/PasswordReset";
 
 type User = {
   id: number;
@@ -36,6 +43,7 @@ const App: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [clientUser, setClientUser] = useState<User>();
   const [socket, setSocket] = useState<Socket>();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const rooturl = process.env.REACT_APP_ROOT_URL as string;
@@ -113,13 +121,23 @@ const App: React.FC = () => {
 
   const handleUsers = (user: User, action: string) => {
     switch (action) {
-      case "ADD":
-        {
+      case "ADD": {
+        setUsers((prevState) => {
+          return [...prevState, user];
+        });
+        break;
+      }
+      case "REMOVE": {
+        if (userId !== user.id.toString()) {
+          navigate(userId);
           setUsers((prevState) => {
-            return [...prevState, user];
+            return prevState.filter((prevUser) => {
+              return prevUser.id.toString() !== user.id.toString();
+            });
           });
         }
         break;
+      }
       default: {
         throw new Error("Invalid user action.");
       }
@@ -137,9 +155,10 @@ const App: React.FC = () => {
             }
           ></Route>
           <Route
-            path="edit-profile"
+            path="/edit-profile"
             element={<EditProfile User={clientUser} />}
           ></Route>
+          <Route path="/reset-password" element={<ResetPassword />}></Route>
           <Route path="*" element={<Navigate to={"/m/" + userId} />} />
         </>
       ))
@@ -150,6 +169,7 @@ const App: React.FC = () => {
             element={<Login setUserLogin={setUserLogin} />}
           ></Route>
           <Route path="/signup" element={<Signup />}></Route>
+          <Route path="/reset-password" element={<ResetPassword />}></Route>
           <Route path="*" element={<Navigate to="/login" />} />
         </>
       ));

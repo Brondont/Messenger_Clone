@@ -33,13 +33,23 @@ router.post(
 
 router.put(
   "/signup",
+  isAuth,
   [
     check("username")
       .isLength({ min: 2 })
       .withMessage("Username must be at least 2 characters long."),
   ],
-  isAuth,
   authControllers.putSignup
 );
 
+router.put(
+  "/reset-password",
+  [
+    check("email").isEmail().withMessage("Invalid E-mail submitted"),
+    check(["newPassword", "oldPassword"])
+      .isLength({ min: 5 })
+      .withMessage("Password must be at least 6 characters long."),
+  ],
+  authControllers.putPassword
+);
 module.exports = router;

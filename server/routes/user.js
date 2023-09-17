@@ -5,7 +5,11 @@ const route = express.Router();
 const userControllers = require("../controllers/user");
 const isAuth = require("../middleware/is-auth");
 
-route.get("/m/:receiverId", isAuth, userControllers.getUserMessages);
+route.get(
+  "/m/:receiverId/:messageCount",
+  isAuth,
+  userControllers.getUserMessages
+);
 
 route.post("/send-message", isAuth, userControllers.postUserMessage);
 
@@ -16,6 +20,8 @@ route.get("/usersSearch/:userName", isAuth, userControllers.getUsersSearched);
 route.post("/addFriend/:friendId", isAuth, userControllers.postAddFriend);
 
 route.put("/addFriend/:notifierId", isAuth, userControllers.putFriendRequest);
+
+route.put("/removeFriend", isAuth, userControllers.putRemoveFriend);
 
 route.get(
   "/notifications/:notifiedId",

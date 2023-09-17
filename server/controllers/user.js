@@ -11,11 +11,11 @@ const { handleError } = require("../util/error");
 
 exports.getUserMessages = (req, res, next) => {
   const receivingUserId = req.params.receiverId;
+  const messageCount = +req.params.messageCount || 30;
 
-  Message.findAll({
-    order: [["id", "DESC"]],
-    limit: 30,
-    attributes: ["message", "createdAt", "id", "senderId", "status"],
+  let allMessagesRetrieved = false;
+
+  Message.count({
     where: {
       [Op.or]: [
         { senderId: receivingUserId, receiverId: req.userId }, // Messages from user1 to user2
@@ -23,13 +23,27 @@ exports.getUserMessages = (req, res, next) => {
       ],
     },
   })
+    .then((messagesCount) => {
+      allMessagesRetrieved = messageCount >= messagesCount;
+      return Message.findAll({
+        order: [["id", "DESC"]],
+        limit: messageCount,
+        attributes: ["message", "createdAt", "id", "senderId", "status"],
+        where: {
+          [Op.or]: [
+            { senderId: receivingUserId, receiverId: req.userId }, // Messages from user1 to user2
+            { senderId: req.userId, receiverId: receivingUserId }, // Messages from user2 to user1
+          ],
+        },
+      });
+    })
     .then((messages) => {
       if (!messages) {
         handleError("No messages found", 404, [
           { message: "No messages between users" },
         ]);
       }
-      res.status(200).json({ messages });
+      res.status(200).json({ messages, allMessagesRetrieved });
       io.getIO().to(receivingUserId).to(req.userId).emit("seenMessage", {
         receiverId: req.userId,
         senderId: receivingUserId, // have to flip them since the user that is making the request is the "sender" even tho he is the one that received the message
@@ -90,6 +104,26 @@ exports.getUserContacts = (req, res, next) => {
         return User.findAll({
           attributes: ["username", "id", "email", "gender", "imagePath"],
           where: { id: req.userId },
+          include: [
+            {
+              model: Message,
+              as: "SentMessages",
+              limit: 1,
+              order: [["id", "DESC"]],
+              where: {
+                [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+              },
+            },
+            {
+              model: Message,
+              as: "ReceivedMessages",
+              limit: 1,
+              order: [["id", "DESC"]],
+              where: {
+                [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+              },
+            },
+          ],
         });
       }
       return User.findAll({
@@ -185,18 +219,19 @@ exports.postAddFriend = (req, res, next) => {
   Friend.findOne({ where: { userId1, userId2 } })
     .then((friendRequest) => {
       if (friendRequest) {
-        let error;
         switch (friendRequest.type) {
           case "Pending": {
             handleError("Friend request already exists", 409);
-          }
-          case "Blocked": {
-            handleError("You have been blocked by this user.", 403);
           }
           case "Accepted": {
             handleError("You are already friends with this user.", 409);
           }
           case "Rejected": {
+            friendRequest.type = "Pending";
+            friendRequest.confirmedAt = null;
+            return friendRequest.save();
+          }
+          case "Block": {
             friendRequest.type = "Pending";
             friendRequest.confirmedAt = null;
             return friendRequest.save();
@@ -266,7 +301,7 @@ exports.putFriendRequest = (req, res, next) => {
   Friend.findOne({ where: { userId1, userId2 } })
     .then((friendRequest) => {
       if (!friendRequest) {
-        handleError("Friend requst doesn't exist", 404);
+        handleError("Friend request doesn't exist", 404);
       }
       if (friendRequest.confirmedAt) {
         return friendRequest;
@@ -294,6 +329,26 @@ exports.putFriendRequest = (req, res, next) => {
       User.findAll({
         where: { id: [notifiedId, notifierId] },
         attributes: ["username", "id", "gender", "imagePath"],
+        include: [
+          {
+            model: Message,
+            as: "SentMessages",
+            limit: 1,
+            order: [["id", "DESC"]],
+            where: {
+              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+            },
+          },
+          {
+            model: Message,
+            as: "ReceivedMessages",
+            limit: 1,
+            order: [["id", "DESC"]],
+            where: {
+              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
+            },
+          },
+        ],
       })
         .then((users) => {
           if (!users) {
@@ -342,6 +397,61 @@ exports.putFriendRequest = (req, res, next) => {
     })
     .catch((err) => {
       throw err;
+    });
+};
+
+exports.putRemoveFriend = (req, res, next) => {
+  const { friendId, type } = req.body;
+  if (type !== "Unfriend" && type !== "Block") {
+    const error = new Error("Invalid friend operation");
+    error.statusCode = 403;
+    return next(error);
+  }
+
+  let userId1;
+  let userId2;
+  if (friendId > req.userId) {
+    userId1 = friendId;
+    userId2 = req.userId;
+  } else if (friendId < req.userId) {
+    userId1 = req.userId;
+    userId2 = friendId;
+  } else {
+    const error = new Error("User unfriending himself");
+    error.statusCode = 403;
+    return next(error);
+  }
+
+  Friend.findOne({ where: { userId1, userId2 } })
+    .then((friendRequest) => {
+      if (!friendRequest) {
+        handleError("You aren't friends with this user.", 404);
+      }
+      if (type === "Unfriend") {
+        return friendRequest.destroy();
+      } else {
+        friendRequest.type = type;
+        return friendRequest.save();
+      }
+    })
+    .then(() => {
+      return User.findAll({
+        where: { id: [friendId, req.userId] },
+        attributes: ["username", "id", "gender", "imagePath"],
+      });
+    })
+    .then((usersDoc) => {
+      io.getIO()
+        .to(friendId.toString())
+        .to(req.userId)
+        .emit("friendRemove", usersDoc);
+      return res.status(200).json();
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      return next(err);
     });
 };
 

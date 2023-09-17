@@ -23,7 +23,9 @@ type UserCardProps = {
   lastMessage?: UserMessage | undefined;
   user: User | undefined;
   options?: {
-    isAddFriend: boolean;
+    isAddFriend?: boolean;
+    isFriendProfile?: boolean;
+    onHover?: boolean;
   };
   onClick?: () => void;
 };
@@ -39,7 +41,10 @@ const Usercard: React.FC<UserCardProps> = ({
   const rooturl = process.env.REACT_APP_ROOT_URL;
 
   const handleAddFriend = () => {
-    fetch(rooturl + "/addFriend/" + user!.id, {
+    if (!user) {
+      return;
+    }
+    fetch(rooturl + "/addFriend/" + user.id, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
@@ -59,8 +64,35 @@ const Usercard: React.FC<UserCardProps> = ({
       });
   };
 
+  const handleRemoveFriend = (e: React.MouseEvent<HTMLElement>) => {
+    if (!user) {
+      return;
+    }
+    const type = e.currentTarget.innerHTML;
+    fetch(rooturl + "/removeFriend", {
+      method: "PUT",
+      body: JSON.stringify({
+        friendId: user.id,
+        type: type,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+  };
+
   return (
-    <div className="user_card" onClick={onClick}>
+    <div
+      className={
+        options
+          ? options.onHover
+            ? "user_card"
+            : "user_card_noHover"
+          : "user_card"
+      }
+      onClick={onClick}
+    >
       {user ? (
         <>
           <img
@@ -87,10 +119,24 @@ const Usercard: React.FC<UserCardProps> = ({
               </>
             )}
           </div>
-          {options && options.isAddFriend && (
-            <div className="add-friend">
-              <button onClick={handleAddFriend}>Add Friend</button>
-            </div>
+          {options ? (
+            (options.isAddFriend && (
+              <div className="add-friend">
+                <button onClick={handleAddFriend}>Add Friend</button>
+              </div>
+            )) ||
+            (options.isFriendProfile && (
+              <div className="friend-profile">
+                <div className="unfriend" onClick={handleRemoveFriend}>
+                  Unfriend
+                </div>
+                <div className="block" onClick={handleRemoveFriend}>
+                  Block
+                </div>
+              </div>
+            ))
+          ) : (
+            <></>
           )}
         </>
       ) : (

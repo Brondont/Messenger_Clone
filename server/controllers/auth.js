@@ -2,12 +2,23 @@ const bcrypt = require("bcrypt");
 const path = require("path");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const nodemailerMailgun = require("nodemailer-mailgun-transport");
 
 const User = require("../models/user");
 
 const { clearImage } = require("../util/file");
 
 const { handleError } = require("../util/error");
+
+const transporter = nodemailer.createTransport(
+  nodemailerMailgun({
+    auth: {
+      api_key: process.env.MAILGUN_APIKEY,
+      domain: process.env.MAILGUN_DOMAIN,
+    },
+  })
+);
 
 exports.postLogin = (req, res, next) => {
   const errors = validationResult(req);
@@ -173,5 +184,81 @@ exports.putSignup = (req, res, next) => {
         err.statusCode = 500;
       }
       next(err);
+    });
+};
+
+exports.putPassword = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    handleError("Input validation failed", 422, errors.array());
+  }
+  const { email, newPassword, oldPassword } = req.body;
+  if (newPassword === oldPassword) {
+    handleError("You must input a new passowrd", 422, [
+      {
+        type: "invalid",
+        value: newPassword,
+        msg: "You must input a new password",
+        path: "newPassword",
+        location: "body",
+      },
+      {
+        type: "invalid",
+        value: oldPassword,
+        msg: "You must input a new password",
+        path: "oldPassword",
+        location: "body",
+      },
+    ]);
+  }
+  let user;
+  User.findOne({ where: { email } })
+    .then((userDoc) => {
+      if (!userDoc) {
+        handleError("User with this email does not exist.", 404, [
+          {
+            type: "invalid",
+            value: email,
+            msg: "User with this email does not exist",
+            path: "email",
+            location: "body",
+          },
+        ]);
+      }
+      user = userDoc;
+      return bcrypt.compare(oldPassword, userDoc.password);
+    })
+    .then((passwordIsCorrect) => {
+      if (!passwordIsCorrect) {
+        handleError("Incorrect password.", 401, [
+          {
+            type: "invalid",
+            value: oldPassword,
+            msg: "Incorrect user password",
+            path: "oldPassword",
+            location: "body",
+          },
+        ]);
+      }
+      return bcrypt.hash(newPassword, 12);
+    })
+    .then((newHashedPassword) => {
+      user.password = newHashedPassword;
+      return user.save();
+    })
+    .then(() => {
+      transporter.sendMail({
+        from: "noreply@gmail.com",
+        to: email,
+        subject: "Password Reset",
+        html: "<div> password reset succesfully </div>",
+      });
+      return res.status(200).json({ message: "password changed succesfully" });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      return next(err);
     });
 };

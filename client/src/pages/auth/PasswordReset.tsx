@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Logo from "../../public/images/367690509_814737896696440_8796982152716932950_n.jpg";
+import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 import Input from "../../components/Form/Input/Input";
+
 import { isRequired, isEmail, isLength } from "../../util/validators";
 import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
 
@@ -23,28 +23,33 @@ type Form = {
   };
 };
 
-const Login: React.FC<{
-  setUserLogin: (userId: string, token: string) => void;
-}> = ({ setUserLogin }) => {
+const ResetPassword: React.FC = () => {
   const [errorMessage, setErrorMessages] = useState<ErrorServerResponse[]>([]);
-  const [isLoading, setIsloading] = useState<boolean>(false);
-  const [loginForm, setLoginForm] = useState<Form>({
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [passwordResetForm, setPasswordResetForm] = useState<Form>({
     email: {
       value: "",
       valid: true,
       validators: [isRequired, isEmail],
     },
-    password: {
+    oldPassword: {
+      value: "",
+      valid: true,
+      validators: [isRequired, isLength({ min: 5 })],
+    },
+    newPassword: {
       value: "",
       valid: true,
       validators: [isRequired, isLength({ min: 5 })],
     },
   });
+  const navigate = useNavigate();
 
   const rooturl = process.env.REACT_APP_ROOT_URL;
+  const token = localStorage.getItem("token");
 
   const inputChangeHandler = (value: string, name: string) => {
-    setLoginForm((prevState: Form) => {
+    setPasswordResetForm((prevState: Form) => {
       const fieldConfig = prevState[name];
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {
@@ -62,19 +67,23 @@ const Login: React.FC<{
     });
   };
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) {
       return;
     }
-    setIsloading(true);
+    setIsLoading(true);
     setErrorMessages([]);
+    console.log("this ran");
 
     const formData = new FormData(e.currentTarget);
 
-    fetch(rooturl + "/login", {
-      method: "POST",
+    fetch(rooturl + "/reset-password", {
+      method: "PUT",
       body: formData,
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
       .then((res) => {
         return res.json();
@@ -90,7 +99,7 @@ const Login: React.FC<{
               setErrorMessages((prevState: ErrorServerResponse[]) => {
                 return [...prevState, err];
               });
-              setLoginForm((prevState) => {
+              setPasswordResetForm((prevState) => {
                 return {
                   ...prevState,
                   [err.path]: {
@@ -100,69 +109,61 @@ const Login: React.FC<{
                 };
               });
             });
-            setIsloading(false);
-            return;
           } else {
             throw resData.error;
           }
+          setIsLoading(false);
+          return;
         }
-        setUserLogin(resData.userId, resData.token);
-        localStorage.setItem("userId", resData.userId);
-        localStorage.setItem("token", resData.token);
-        const remainingMiliseconds = 60 * 60 * 1000;
-        const expiryDate = new Date(
-          new Date().getTime() + remainingMiliseconds
-        );
-        localStorage.setItem("expiryDate", expiryDate.toISOString());
-        console.log("user Logged in successfully !");
-        setIsloading(false);
+        navigate("/");
+        setIsLoading(false);
       })
       .catch((err) => {
-        setIsloading(false);
-        console.log("some unexpected error occured: ", err);
+        setIsLoading(false);
+        throw err;
       });
   };
+
   return (
     <section>
-      {/* <img src={Logo} placeholder="Logo" /> */}
-      <form className="auth-form" onSubmit={handleLogin}>
-        <img src={Logo} placeholder="Logo" className="main-image" />
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <label htmlFor="email">Current Email</label>
         <Input
           name="email"
           placeholder="Email"
           type="text"
           onChange={inputChangeHandler}
           errorMessage={errorMessage}
-          valid={loginForm.email.valid}
-          value={loginForm.email.value}
+          valid={passwordResetForm.email.valid}
+          value={passwordResetForm.email.value}
           required={true}
         />
+        <label htmlFor="oldPassword">Old Password</label>
         <Input
-          name="password"
-          placeholder="Password"
+          name="oldPassword"
+          placeholder="Old Password"
           type="password"
           onChange={inputChangeHandler}
           errorMessage={errorMessage}
-          valid={loginForm.password.valid}
-          value={loginForm.password.value}
+          valid={passwordResetForm.oldPassword.valid}
+          value={passwordResetForm.oldPassword.value}
+          required={true}
+        />
+        <label htmlFor="newPassword">New Password</label>
+        <Input
+          name="newPassword"
+          placeholder="New Password"
+          type="password"
+          onChange={inputChangeHandler}
+          errorMessage={errorMessage}
+          valid={passwordResetForm.newPassword.valid}
+          value={passwordResetForm.newPassword.value}
           required={true}
         />
         <button type="submit"> Continue </button>
       </form>
-      <p>
-        Don't have an account?
-        <Link to="/signup">
-          <b> Sign up here</b>
-        </Link>
-      </p>
-      <p>
-        Forgot your password?
-        <Link to="/reset-password">
-          <b> Reset password</b>
-        </Link>
-      </p>
     </section>
   );
 };
 
-export default Login;
+export default ResetPassword;

@@ -129,59 +129,65 @@ const Notifications: React.FC = () => {
           <div className="notifications-container">
             {notifications.length > 0 ? (
               <>
-                {notifications.map((notification: Notification) => {
-                  if (notification.type === "Friendship") {
-                    return (
-                      <div
-                        key={notification.id}
-                        className={
-                          notification.seen
-                            ? "notifications-item seen"
-                            : "notifications-item"
-                        }
-                      >
-                        <p>{notification.desc}</p>
-                        {notification.seen && <p> seen </p>}
-                        {!notification.seen && (
-                          <>
-                            <div
-                              className="notifications-button accept"
-                              onClick={(e) => {
-                                return handleFriendResponse(e, notification);
-                              }}
-                            >
-                              Accept
-                            </div>
-                            <div
-                              className="notifications-button decline"
-                              onClick={(e) => {
-                                return handleFriendResponse(e, notification);
-                              }}
-                            >
-                              Decline
-                            </div>
-                          </>
-                        )}
-                        <span>{calculateTimeAgo(notification.createdAt)}</span>
-                      </div>
-                    );
-                  } else if (notification.type === "FriendshipReply") {
-                    return (
-                      <div
-                        key={notification.id}
-                        className={
-                          notification.seen
-                            ? "notifications-item seen"
-                            : "notifications-item"
-                        }
-                      >
-                        <p>{notification.desc}</p>
-                        {notification.seen && <p> seen </p>}
-                        <span>{calculateTimeAgo(notification.createdAt)}</span>
-                      </div>
-                    );
-                  }
-                })}
+                {notifications
+                  .map((notification: Notification) => {
+                    if (notification.type === "Friendship") {
+                      return (
+                        <div
+                          key={notification.id}
+                          className={
+                            notification.seen
+                              ? "notifications-item seen"
+                              : "notifications-item"
+                          }
+                        >
+                          <p>{notification.desc}</p>
+                          {notification.seen && <p> seen </p>}
+                          {!notification.seen && (
+                            <>
+                              <div
+                                className="notifications-button accept"
+                                onClick={(e) => {
+                                  return handleFriendResponse(e, notification);
+                                }}
+                              >
+                                Accept
+                              </div>
+                              <div
+                                className="notifications-button decline"
+                                onClick={(e) => {
+                                  return handleFriendResponse(e, notification);
+                                }}
+                              >
+                                Decline
+                              </div>
+                            </>
+                          )}
+                          <span>
+                            {calculateTimeAgo(notification.createdAt)}
+                          </span>
+                        </div>
+                      );
+                    } else if (notification.type === "FriendshipReply") {
+                      return (
+                        <div
+                          key={notification.id}
+                          className={
+                            notification.seen
+                              ? "notifications-item seen"
+                              : "notifications-item"
+                          }
+                        >
+                          <p>{notification.desc}</p>
+                          {notification.seen && <p> seen </p>}
+                          <span>
+                            {calculateTimeAgo(notification.createdAt)}
+                          </span>
+                        </div>
+                      );
+                    }
+                  })
+                  .reverse()}
               </>
             ) : (
               <div className="notificatins-item-missing">

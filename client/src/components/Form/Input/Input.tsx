@@ -16,6 +16,7 @@ type InputProps = {
   label?: string;
   placeholder?: string;
   errorMessage?: ErrorServerResponse[];
+  className?: string;
   type: string;
   name: string;
   onChange: (value: string, name: string) => void;
@@ -28,12 +29,14 @@ const Input: React.FC<InputProps> = ({
   placeholder,
   type,
   name,
+  className,
   label,
   errorMessage,
   onChange,
 }) => {
   let invalidMessage;
   if (errorMessage) {
+    // reversing the array to get the newest added error
     const error = errorMessage.reverse().find((err) => {
       return err.path === name;
     });
@@ -44,13 +47,13 @@ const Input: React.FC<InputProps> = ({
   return (
     <div className="input">
       {label && <label htmlFor={name}>{label}</label>}
-      {!valid && (
+      {!valid && errorMessage && (
         <span className="error">
           {invalidMessage ? invalidMessage : "Invalid input."}
         </span>
       )}
       <input
-        className={valid ? "valid" : "invalid"}
+        className={className && className + (valid ? " valid" : " invalid")}
         placeholder={placeholder}
         name={name}
         type={type}

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, ChangeEvent, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import socketIOClient from "socket.io-client";
 import "./MainChat.css";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
 import Usercard from "../Usercard/Usercard";
+import Input from "../Form/Input/Input";
 
 type User = {
   id: number;
@@ -27,6 +27,11 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
+  const [profileIsOpen, setProfileIsOpen] = useState<boolean>(false);
+  const [messageCount, setMessageCount] = useState<number>(30);
+  const [allMessagesRetrieved, setAllMessagesRetrieved] = useState<boolean>(
+    false
+  );
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
   const rooturl = process.env.REACT_APP_ROOT_URL as string;
@@ -35,23 +40,38 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
 
   const { socket } = useContext(AuthContext) as AuthContextType;
 
-  const updateUserMessage = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserMessage(e.target.value);
+  const updateUserMessage = (value: string, name: string) => {
+    setUserMessage(value);
+  };
+
+  const updateProfileIsOpen = () => {
+    setProfileIsOpen((prevState) => {
+      return !prevState;
+    });
   };
 
   const loadMessages = () => {
-    fetch(rooturl + "/m/" + activeUserWindow, {
+    fetch(rooturl + "/m/" + activeUserWindow + "/" + messageCount, {
       headers: { Authorization: "Bearer " + token },
     })
       .then((res) => {
         return res.json();
       })
       .then((resData) => {
-        return setMessages(resData.messages);
+        console.log(resData);
+        setMessages(resData.messages);
+        setAllMessagesRetrieved(resData.allMessagesRetrieved);
       })
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const handleMoreMessages = () => {
+    setMessageCount((prevState) => {
+      return prevState + 30;
+    });
+    loadMessages();
   };
 
   useEffect(() => {
@@ -101,7 +121,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     return () => {
       socket.off("newMessage");
     };
-  }, [activeUserWindow, Users]);
+  }, [activeUserWindow, Users, messageCount]);
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -141,7 +161,15 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           <div className="main_chat__user">
             {activeUser ? (
               <>
-                <Usercard user={activeUser} />
+                <Usercard user={activeUser} onClick={updateProfileIsOpen} />
+                {profileIsOpen && (
+                  <div className="main_chat__user_profile">
+                    <Usercard
+                      user={activeUser}
+                      options={{ isFriendProfile: true, onHover: false }}
+                    />
+                  </div>
+                )}
               </>
             ) : (
               <div> Loading user...</div>
@@ -187,6 +215,22 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
                     </div>
                   );
                 })}
+                {allMessagesRetrieved ? (
+                  <div className="main_chat__user-messages-start">
+                    Welcome to the start of ur conversations !
+                  </div>
+                ) : (
+                  <>
+                    {messageCount >= 30 && (
+                      <div
+                        className="main_chat__user-load-more"
+                        onClick={handleMoreMessages}
+                      >
+                        Load more messages...
+                      </div>
+                    )}
+                  </>
+                )}
               </>
             ) : (
               <div>Loading messages...</div>
@@ -194,13 +238,15 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           </div>
           <div className="main_chat__user_input">
             <form onSubmit={sendUserMessage}>
-              <input
-                className="user_input"
+              <Input
                 name="user_input"
+                className="user_input"
                 type="text"
                 placeholder="Aa"
                 value={userMessage}
                 onChange={updateUserMessage}
+                valid={true}
+                required={true}
               />
             </form>
           </div>

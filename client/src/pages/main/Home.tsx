@@ -34,9 +34,14 @@ const Home: React.FC<HomePageProps> = ({ Users, socket, handleUsers }) => {
     if (!Users || !socket) {
       return;
     }
-    socket.on("friendAccept", (user) => {
-      console.log("this ran");
+    socket.on("friendAccept", (user: User) => {
       handleUsers(user, "ADD");
+    });
+
+    socket.on("friendRemove", (users: User[]) => {
+      users.map((user: User) => {
+        handleUsers(user, "REMOVE");
+      });
     });
 
     return () => {

@@ -140,7 +140,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
         <form className="auth-form" onSubmit={handleProfileEdit}>
           <h1> Update your profile </h1>
           <Input
-            label="username"
+            label="Username"
             name="username"
             placeholder="Username"
             type="text"
@@ -171,7 +171,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
       )}
       <p>
         Reset password ?{" "}
-        <Link to="/login">
+        <Link to="/reset-password">
           <b>Click here</b>
         </Link>
       </p>
