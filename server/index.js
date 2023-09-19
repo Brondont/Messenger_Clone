@@ -63,7 +63,7 @@ Notification.belongsTo(User, { as: "Notifier", foreignKey: "notifierId" });
 
 db.sync()
   .then(() => {
-    const server = app.listen(8000, (Server) => {
+    const server = app.listen(process.env.PORT, (Server) => {
       console.log("server started!");
     });
     const io = require("./socket").init(server);
