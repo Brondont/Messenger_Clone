@@ -117,7 +117,7 @@ const App: React.FC = () => {
     return () => {
       setSocket(newSocket.disconnect());
     };
-  }, [location]);
+  }, [location, rooturl]);
 
   const handleUsers = (user: User, action: string) => {
     switch (action) {
