@@ -84,7 +84,7 @@ db.sync()
 
         socket.join(userId);
 
-        socket.on("disconnect", (result, result2) => {
+        socket.on("disconnect", () => {
           console.log("Client disconnected!");
           socket.leave(userId);
         });
