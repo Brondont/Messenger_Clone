@@ -4,7 +4,7 @@ import "./MainChat.css";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../Usercard/Usercard";
+import Usercard from "../usercard/Usercard";
 import Input from "../Form/Input/Input";
 
 type User = {
@@ -29,9 +29,8 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [activeUser, setActiveUser] = useState<User>();
   const [profileIsOpen, setProfileIsOpen] = useState<boolean>(false);
   const [messageCount, setMessageCount] = useState<number>(30);
-  const [allMessagesRetrieved, setAllMessagesRetrieved] = useState<boolean>(
-    false
-  );
+  const [allMessagesRetrieved, setAllMessagesRetrieved] =
+    useState<boolean>(false);
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
   const rooturl = process.env.REACT_APP_ROOT_URL as string;

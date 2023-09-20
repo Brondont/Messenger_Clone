@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./SideBar.css";
 
-import Usercard from "../Usercard/Usercard";
+import Usercard from "../usercard/Usercard";
 import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
-import Notifications from "../Notifications/Notifications";
-import UserSearch from "../UserSearch/UserSearch";
+import Notifications from "../notifications/Notifications";
+import UserSearch from "../userSearch/UserSearch";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
