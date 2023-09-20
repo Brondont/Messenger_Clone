@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 
-import MainChat from "../../components/mainchat/MainChat";
-import SideBar from "../../components/sidebar/SideBar";
+import MainChat from "../../components/mainchat/MainChat.tsx";
+import SideBar from "../../components/sidebar/SideBar.tsx";
 
 type User = {
   id: number;
