@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
-import SideBar from "../../components/sidebar/SideBar";
 import MainChat from "../../components/mainchat/MainChat";
+import SideBar from "../../components/sidebar/SideBar";
 
 type User = {
   id: number;
