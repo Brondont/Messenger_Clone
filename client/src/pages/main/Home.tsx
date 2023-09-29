@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
-import MainChat from "../../components/Mainchat/MainChat";
 import SideBar from "../../components/Sidebar/SideBar";
 
 type User = {
@@ -51,7 +50,6 @@ const Home: React.FC<HomePageProps> = ({ Users, socket, handleUsers }) => {
   return (
     <>
       <SideBar Users={Users} />
-      <MainChat Users={Users} />
     </>
   );
 };
