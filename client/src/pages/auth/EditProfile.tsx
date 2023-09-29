@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/Form/Input/Input";
 import "./Auth.css";
 
-import { isRequired, isEmail, isLength } from "../../util/validators";
-import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
+import { isRequired, isLength } from "../../util/validators";
+import { ValidatorFunction } from "../../util/validators";
 
 type User = {
   id: number;
@@ -101,6 +101,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
                   },
                 };
               });
+              return err;
             });
           }
           setIsLoading(false);
@@ -121,6 +122,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {
         isValid = isValid && validator(value);
+        return validator;
       });
       const updatedForm = {
         ...prevState,

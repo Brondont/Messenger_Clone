@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./UserSearch.css";
 
-import UserCard from "../usercard/Usercard";
+import UserCard from "../Usercard/Usercard";
 
 type User = {
   id: number;

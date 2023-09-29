@@ -5,7 +5,7 @@ import "./Auth.css";
 import Input from "../../components/Form/Input/Input";
 
 import { isRequired, isEmail, isLength } from "../../util/validators";
-import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
+import { ValidatorFunction } from "../../util/validators";
 
 export type ErrorServerResponse = {
   type: string;
@@ -54,6 +54,7 @@ const ResetPassword: React.FC = () => {
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {
         isValid = isValid && validator(value);
+        return validator;
       });
       const updatedForm = {
         ...prevState,
@@ -108,6 +109,7 @@ const ResetPassword: React.FC = () => {
                   },
                 };
               });
+              return err;
             });
           } else {
             throw resData.error;

@@ -38,7 +38,6 @@ type UserMessage = {
 
 const App: React.FC = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
-  const [token, setToken] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [clientUser, setClientUser] = useState<User>();
@@ -49,14 +48,12 @@ const App: React.FC = () => {
   const rooturl = process.env.REACT_APP_ROOT_URL as string;
 
   const setUserLogin = (userId: string, token: string) => {
-    setToken(token);
     setUserId(userId);
     setIsAuth(true);
   };
 
   const logoutHandler = () => {
     setIsAuth(false);
-    setToken("");
     setUserId("");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");

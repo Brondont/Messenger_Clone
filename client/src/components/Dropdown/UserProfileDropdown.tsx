@@ -6,7 +6,7 @@ import UserSettingsIcon from "../../public/images/profile-settings.png";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../usercard/Usercard";
+import Usercard from "../Usercard/Usercard";
 
 type User = {
   id: number;
@@ -37,16 +37,12 @@ const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
             <img
               src={UserSettingsIcon}
               className="dropdown-item-icon"
-              placeholder="settings"
+              alt="settings"
             />
             <div className="dropdown-item-text">Profile Settings</div>
           </Link>
           <div className="dropdown-item-button" onClick={logoutHandler}>
-            <img
-              src={LogoutIcon}
-              className="dropdown-item-icon"
-              placeholder="logout"
-            />
+            <img src={LogoutIcon} className="dropdown-item-icon" alt="logout" />
             <div className="dropdown-item-text">Logout</div>
           </div>
         </div>

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import "./MainChat.css";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../usercard/Usercard";
+import Usercard from "../Usercard/Usercard";
 import Input from "../Form/Input/Input";
 
 type User = {
@@ -49,7 +49,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     });
   };
 
-  const loadMessages = () => {
+  const loadMessages = useCallback(() => {
     fetch(rooturl + "/m/" + activeUserWindow + "/" + messageCount, {
       headers: { Authorization: "Bearer " + token },
     })
@@ -64,7 +64,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }, [activeUserWindow, messageCount, rooturl, token]);
 
   const handleMoreMessages = () => {
     setMessageCount((prevState) => {
@@ -120,7 +120,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     return () => {
       socket.off("newMessage");
     };
-  }, [activeUserWindow, Users, messageCount]);
+  }, [activeUserWindow, Users, messageCount, loadMessages, socket, userId]);
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

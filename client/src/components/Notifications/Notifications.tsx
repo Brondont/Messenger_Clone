@@ -80,6 +80,7 @@ const Notifications: React.FC = () => {
             if (!notif.seen) {
               count++;
             }
+            return notif;
           });
           return count;
         });
@@ -119,7 +120,11 @@ const Notifications: React.FC = () => {
   return (
     <>
       <div className="notifications-icon" onClick={handleToggleNotifcations}>
-        <img className="notifications-image" src={NotifImage} />
+        <img
+          className="notifications-image"
+          src={NotifImage}
+          alt="notifications"
+        />
         {notificationsCount > 0 && (
           <span className="notifications-count"> {notificationsCount} </span>
         )}
@@ -185,6 +190,8 @@ const Notifications: React.FC = () => {
                           </span>
                         </div>
                       );
+                    } else {
+                      return <div></div>;
                     }
                   })
                   .reverse()}

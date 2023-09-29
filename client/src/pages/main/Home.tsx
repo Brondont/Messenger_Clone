@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
-import MainChat from "../../components/mainchat/MainChat.tsx";
-import SideBar from "../../components/sidebar/SideBar.tsx";
+import MainChat from "../../components/Mainchat/MainChat";
+import SideBar from "../../components/Sidebar/SideBar";
 
 type User = {
   id: number;
@@ -40,13 +40,14 @@ const Home: React.FC<HomePageProps> = ({ Users, socket, handleUsers }) => {
     socket.on("friendRemove", (users: User[]) => {
       users.map((user: User) => {
         handleUsers(user, "REMOVE");
+        return user;
       });
     });
 
     return () => {
       socket.off("friendAccept");
     };
-  }, [socket, Users]);
+  }, [socket, Users, handleUsers]);
   return (
     <>
       <SideBar Users={Users} />

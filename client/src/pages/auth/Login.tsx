@@ -5,7 +5,7 @@ import "./Auth.css";
 
 import Input from "../../components/Form/Input/Input";
 import { isRequired, isEmail, isLength } from "../../util/validators";
-import { ValidatorFunction, IsLengthFunction } from "../../util/validators";
+import { ValidatorFunction } from "../../util/validators";
 
 export type ErrorServerResponse = {
   type: string;
@@ -49,6 +49,7 @@ const Login: React.FC<{
       let isValid = true;
       fieldConfig.validators.map((validator: ValidatorFunction) => {
         isValid = isValid && validator(value);
+        return validator;
       });
       const updatedForm = {
         ...prevState,
@@ -99,6 +100,7 @@ const Login: React.FC<{
                   },
                 };
               });
+              return err;
             });
             setIsloading(false);
             return;
@@ -124,9 +126,8 @@ const Login: React.FC<{
   };
   return (
     <section>
-      {/* <img src={Logo} placeholder="Logo" /> */}
       <form className="auth-form" onSubmit={handleLogin}>
-        <img src={Logo} placeholder="Logo" className="main-image" />
+        <img src={Logo} alt="Logo" className="main-image" />
         <Input
           name="email"
           placeholder="Email"
