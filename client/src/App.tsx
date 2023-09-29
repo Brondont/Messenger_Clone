@@ -10,9 +10,6 @@ import socketIOClient, { Socket } from "socket.io-client";
 import { ErrorBoundary } from "react-error-boundary";
 import "./App.css";
 
-import MainChat from "./components/Mainchat/MainChat";
-import SideBar from "./components/Sidebar/SideBar";
-
 import { AuthContext } from "./authContext";
 
 import Home from "./pages/main/Home";

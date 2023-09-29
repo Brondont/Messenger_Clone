@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
-// import MainChat from "../../components/Mainchat/MainChat";
+import MainChat from "../../components/Mainchat/MainChat";
 import SideBar from "../../components/Sidebar/SideBar";
 
 type User = {
@@ -38,20 +38,20 @@ const Home: React.FC<HomePageProps> = ({ Users, socket, handleUsers }) => {
     });
 
     socket.on("friendRemove", (users: User[]) => {
-      users.map((user: User) => {
+      users.forEach((user: User) => {
         handleUsers(user, "REMOVE");
-        return user;
       });
     });
 
     return () => {
       socket.off("friendAccept");
+      socket.off("friendRemove");
     };
   }, [socket, Users, handleUsers]);
   return (
     <>
       <SideBar Users={Users} />
-      {/* <MainChat Users={Users} /> */}
+      <MainChat Users={Users} />
     </>
   );
 };
