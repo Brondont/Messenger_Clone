@@ -39,7 +39,6 @@ const Usercard: React.FC<UserCardProps> = ({
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
   const rooturl = process.env.REACT_APP_ROOT_URL;
-  var help;
 
   const handleAddFriend = () => {
     if (!user) {

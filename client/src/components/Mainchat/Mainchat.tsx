@@ -23,7 +23,7 @@ type UserMessage = {
   status: string;
 };
 
-const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
+export const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
@@ -256,5 +256,3 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     </div>
   );
 };
-
-export default MainChat;

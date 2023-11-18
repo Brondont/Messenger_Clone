@@ -27,7 +27,7 @@ type UserMessage = {
   status: string;
 };
 
-const SideBar: React.FC<{
+export const SideBar: React.FC<{
   Users: User[];
 }> = ({ Users = [] }) => {
   const [lastUserMessages, setLastUserMessages] = useState<UserMessage[]>([]);
@@ -137,5 +137,3 @@ const SideBar: React.FC<{
     </div>
   );
 };
-
-export default SideBar;
