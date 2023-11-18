@@ -39,6 +39,7 @@ const Usercard: React.FC<UserCardProps> = ({
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
   const rooturl = process.env.REACT_APP_ROOT_URL;
+  var help;
 
   const handleAddFriend = () => {
     if (!user) {
@@ -125,7 +126,7 @@ const Usercard: React.FC<UserCardProps> = ({
                 <button onClick={handleAddFriend}>Add Friend</button>
               </div>
             )) ||
-            (options.isFriendProfile && (
+            (options.isFriendProfile && userId !== user.id.toString() && (
               <div className="friend-profile">
                 <div className="unfriend" onClick={handleRemoveFriend}>
                   Unfriend
