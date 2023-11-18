@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./SideBar.css";
 
-import Usercard from "../Usercard/Usercard";
-import UserProfileDropdown from "../Dropdown/UserProfileDropdown";
-import Notifications from "../Notifications/Notifications";
-import UserSearch from "../Usersearch/UserSearch";
+import Usercard from "../../../components/Usercard/Usercard";
+import UserProfileDropdown from "../../../components/Dropdown/UserProfileDropdown";
+import Notifications from "../../../components/Notifications/Notifications";
+import UserSearch from "../../../components/Usersearch/UserSearch";
 
-import { AuthContext, AuthContextType } from "../../authContext";
+import { AuthContext, AuthContextType } from "../../../authContext";
 
 type User = {
   id: number;
@@ -27,7 +27,7 @@ type UserMessage = {
   status: string;
 };
 
-export const SideBar: React.FC<{
+const SideBar: React.FC<{
   Users: User[];
 }> = ({ Users = [] }) => {
   const [lastUserMessages, setLastUserMessages] = useState<UserMessage[]>([]);
@@ -137,3 +137,5 @@ export const SideBar: React.FC<{
     </div>
   );
 };
+
+export default SideBar;

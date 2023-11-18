@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import "./MainChat.css";
 
-import { AuthContext, AuthContextType } from "../../authContext";
+import { AuthContext, AuthContextType } from "../../../authContext";
 
-import Usercard from "../Usercard/Usercard";
-import Input from "../Form/Input/Input";
+import Usercard from "../../../components/Usercard/Usercard";
+import Input from "../../../components/Form/Input/Input";
 
 type User = {
   id: number;
@@ -23,7 +23,7 @@ type UserMessage = {
   status: string;
 };
 
-export const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
+const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
@@ -256,3 +256,5 @@ export const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
     </div>
   );
 };
+
+export default MainChat;
