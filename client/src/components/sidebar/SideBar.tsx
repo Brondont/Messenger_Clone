@@ -5,7 +5,7 @@ import "./SideBar.css";
 import Usercard from "../usercard/Usercard";
 import UserProfileDropdown from "../dropdown/UserProfileDropdown";
 import Notifications from "../notifications/Notifications";
-import UserSearch from "../userSearch/UserSearch";
+import UserSearch from "../usersearch/UserSearch";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
