@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./SideBar.css";
 
-import Usercard from "../../../components/Usercard/Usercard";
-import UserProfileDropdown from "../../../components/Dropdown/UserProfileDropdown";
-import Notifications from "../../../components/Notifications/Notifications";
-import UserSearch from "../../../components/Usersearch/UserSearch";
+import Usercard from "../usercard/Usercard";
+import UserProfileDropdown from "../dropdown/UserProfileDropdown";
+import Notifications from "../notifications/Notifications";
+import UserSearch from "../Usersearch/UserSearch";
 
-import { AuthContext, AuthContextType } from "../../../authContext";
+import { AuthContext, AuthContextType } from "../../authContext";
 
 type User = {
   id: number;

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Logo from "../../public/images/367690509_814737896696440_8796982152716932950_n.jpg";
 import "./Auth.css";
 
-import Input from "../../components/Form/Input/Input";
+import Input from "../../components/form/input/Input";
 import { isRequired, isEmail, isLength } from "../../util/validators";
 import { ValidatorFunction } from "../../util/validators";
 

@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import "./MainChat.css";
 
-import { AuthContext, AuthContextType } from "../../../authContext";
+import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../../../components/Usercard/Usercard";
-import Input from "../../../components/Form/Input/Input";
+import Usercard from "../usercard/Usercard";
+import Input from "../form/input/Input";
 
 type User = {
   id: number;

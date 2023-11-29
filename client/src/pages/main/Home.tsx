@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
-import MainChat from "./Mainchat/MainChat";
-import SideBar from "./Sidebar/SideBar";
+import MainChat from "../../components/Mainchat/MainChat";
+import SideBar from "../../components/Sidebar/SideBar";
 
 type User = {
   id: number;

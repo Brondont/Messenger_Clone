@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../../components/Form/Input/Input";
+import Input from "../../components/form/input/Input";
 import "./Auth.css";
 
 import { isRequired, isLength } from "../../util/validators";

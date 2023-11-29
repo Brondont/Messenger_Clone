@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-import Input from "../../components/Form/Input/Input";
+import Input from "../../components/form/input/Input";
 
 import { isRequired, isEmail, isLength } from "../../util/validators";
 import { ValidatorFunction } from "../../util/validators";
