@@ -160,15 +160,13 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           <div className="main_chat__user">
             {activeUser ? (
               <>
-                <Usercard user={activeUser} onClick={updateProfileIsOpen} />
-                {profileIsOpen && (
-                  <div className="main_chat__user_profile">
-                    <Usercard
-                      user={activeUser}
-                      options={{ isFriendProfile: true, onHover: false }}
-                    />
-                  </div>
-                )}
+                <Usercard user={activeUser} />
+                <i
+                  className="main_chat__user_options"
+                  onClick={updateProfileIsOpen}
+                >
+                  gay
+                </i>
               </>
             ) : (
               <div> Loading user...</div>

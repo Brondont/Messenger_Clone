@@ -45,12 +45,7 @@ const Login: React.FC<{
 
   const inputChangeHandler = (value: string, name: string) => {
     setLoginForm((prevState: Form) => {
-      const fieldConfig = prevState[name];
       let isValid = true;
-      fieldConfig.validators.map((validator: ValidatorFunction) => {
-        isValid = isValid && validator(value);
-        return validator;
-      });
       const updatedForm = {
         ...prevState,
         [name]: {

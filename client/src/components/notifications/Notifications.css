@@ -38,7 +38,6 @@
   max-height: 50%;
   height: 100%;
   margin-bottom: 400px;
-  padding: 10px;
   overflow: none;
   overflow-y: auto;
   background-color: white;
@@ -50,18 +49,23 @@
 
 .notifications-container {
   display: flex;
-  align-items: center;
+  align-items: left;
   flex-direction: column;
+  padding: 4px;
   height: 100%;
 }
 
 .notifications-item {
-  width: 100%;
+  width: 93%;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin: 2px;
   padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
 }
 
 .notifications-item:hover {

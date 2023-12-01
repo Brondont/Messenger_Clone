@@ -1,9 +1,9 @@
 .main_sidebar {
-  padding-left: 10px;
   display: flex;
   flex-direction: column;
   width: 500px;
   height: 100%;
+  border-right: 1px solid var(--niceGray);
 }
 
 .main_sidebar h1 {
@@ -13,13 +13,19 @@
 .user_messages {
   overflow-y: scroll;
   overflow-x: hidden;
-  width: 100%;
+  padding-left: 10px;
+  width: 97%;
   height: 100%;
 }
 
 .main_top,
 .main_bottom {
+  padding-left: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.main_bottom {
+  border-top: 1px solid var(--niceGray);
 }

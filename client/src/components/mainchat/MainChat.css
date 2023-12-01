@@ -87,6 +87,7 @@
 .main_chat__user {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 10px;
   padding-top: 5px;
   height: 50px;
@@ -147,4 +148,11 @@
 .main_chat__user-messages-start {
   align-self: center;
   color: gray;
+}
+
+.main_chat__user_options {
+  margin-right: 10px;
+}
+.main_chat__user_options:hover {
+  cursor: pointer;
 }

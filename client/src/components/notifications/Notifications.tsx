@@ -147,7 +147,6 @@ const Notifications: React.FC = () => {
                           }
                         >
                           <p>{notification.desc}</p>
-                          {notification.seen && <p> seen </p>}
                           {!notification.seen && (
                             <>
                               <div
@@ -184,7 +183,7 @@ const Notifications: React.FC = () => {
                           }
                         >
                           <p>{notification.desc}</p>
-                          {notification.seen && <p> seen </p>}
+                          {notification.seen}
                           <span>
                             {calculateTimeAgo(notification.createdAt)}
                           </span>
