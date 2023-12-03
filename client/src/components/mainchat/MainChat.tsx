@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import EmojiPicker from "emoji-picker-react";
 import "./MainChat.css";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../usercard/Usercard";
+import UserCard from "../userCard/UserCard";
 import Input from "../form/input/Input";
+
+import Emoji from "../../public/images/emoji.png";
 
 type User = {
   id: number;
@@ -28,29 +31,24 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
   const [profileIsOpen, setProfileIsOpen] = useState<boolean>(false);
+  const [isEmoji, setIsEmoji] = useState<boolean>(false);
   const [messageCount, setMessageCount] = useState<number>(30);
   const [allMessagesRetrieved, setAllMessagesRetrieved] =
     useState<boolean>(false);
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
-  const rooturl = process.env.REACT_APP_ROOT_URL as string;
+  const rootUrl = process.env.REACT_APP_ROOT_URL as string;
   const token = localStorage.getItem("token") as string;
   const userId = localStorage.getItem("userId") as string;
 
   const { socket } = useContext(AuthContext) as AuthContextType;
 
-  const updateUserMessage = (value: string, name: string) => {
-    setUserMessage(value);
-  };
-
   const updateProfileIsOpen = () => {
-    setProfileIsOpen((prevState) => {
-      return !prevState;
-    });
+    setProfileIsOpen(!profileIsOpen);
   };
 
   const loadMessages = useCallback(() => {
-    fetch(rooturl + "/m/" + activeUserWindow + "/" + messageCount, {
+    fetch(rootUrl + "/m/" + activeUserWindow + "/" + messageCount, {
       headers: { Authorization: "Bearer " + token },
     })
       .then((res) => {
@@ -64,7 +62,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
       .catch((err) => {
         console.log(err);
       });
-  }, [activeUserWindow, messageCount, rooturl, token]);
+  }, [activeUserWindow, messageCount, rootUrl, token]);
 
   const handleMoreMessages = () => {
     setMessageCount((prevState) => {
@@ -132,7 +130,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
       message: userMessage,
       receiverId: activeUserWindow,
     };
-    fetch(rooturl + "/send-message", {
+    fetch(rootUrl + "/send-message", {
       method: "POST",
       body: JSON.stringify(userMessageDetails),
       headers: {
@@ -160,7 +158,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           <div className="main_chat__user">
             {activeUser ? (
               <>
-                <Usercard user={activeUser} />
+                <UserCard user={activeUser} />
                 <i
                   className="main_chat__user_options"
                   onClick={updateProfileIsOpen}
@@ -235,13 +233,32 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
           </div>
           <div className="main_chat__user_input">
             <form onSubmit={sendUserMessage}>
+              <div className="main_chat__emoji">
+                <img
+                  className="emoji_button"
+                  src={Emoji}
+                  alt="emoji"
+                  onClick={() => {
+                    setIsEmoji(!isEmoji);
+                  }}
+                />
+                <div className="emoji_menu">
+                  {isEmoji && (
+                    <EmojiPicker
+                      onEmojiClick={(emoji) => {
+                        setUserMessage(userMessage + emoji.emoji);
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
               <Input
                 name="user_input"
                 className="user_input"
                 type="text"
                 placeholder="Aa"
                 value={userMessage}
-                onChange={updateUserMessage}
+                onChange={setUserMessage}
                 valid={true}
                 required={true}
               />

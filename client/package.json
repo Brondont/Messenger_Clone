@@ -11,6 +11,7 @@
     "@types/react": "^18.2.19",
     "@types/react-dom": "^18.2.7",
     "@types/socket.io": "^3.0.2",
+    "emoji-picker-react": "^4.5.16",
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

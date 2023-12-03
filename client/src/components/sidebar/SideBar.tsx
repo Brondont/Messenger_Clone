@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./SideBar.css";
 
-import Usercard from "../usercard/Usercard";
+import Usercard from "../userCard/UserCard";
 import UserProfileDropdown from "../dropdown/UserProfileDropdown";
 import Notifications from "../notifications/Notifications";
 import UserSearch from "../usersearch/UserSearch";

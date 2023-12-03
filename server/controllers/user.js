@@ -82,7 +82,7 @@ exports.postUserMessage = (req, res, next) => {
         .to(receiverId)
         .to(req.userId)
         .emit("newMessage", createdMessage);
-      return res.status(201).json({ message: "Message sent succesfully !" });
+      return res.status(201).json({ message: "Message sent successfully !" });
     })
     .catch((err) => {
       if (!err.statusCode) {

@@ -40,6 +40,7 @@ const Input: React.FC<InputProps> = ({
     const error = errorMessage.reverse().find((err) => {
       return err.path === name;
     });
+
     if (error) {
       invalidMessage = error.msg;
     }

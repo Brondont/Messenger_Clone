@@ -16,19 +16,20 @@
 }
 
 .main_chat__user_input {
-  display: flex;
-  align-items: center;
-  justify-content: right;
   width: 99%;
   margin-bottom: 15px;
 }
 
 .main_chat__user_input form {
-  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 10px;
 }
 
 .user_input {
-  width: 100%;
+  width: 1000px;
   height: 30px;
   border-radius: 10px;
   border: 0px;
@@ -154,5 +155,20 @@
   margin-right: 10px;
 }
 .main_chat__user_options:hover {
+  cursor: pointer;
+}
+
+.main_chat__emoji {
+}
+
+.emoji_menu {
+  position: fixed;
+  margin-top: -490px;
+}
+.emoji_button {
+  width: 20px;
+  margin-left: 10px;
+}
+.emoji_button:hover {
   cursor: pointer;
 }

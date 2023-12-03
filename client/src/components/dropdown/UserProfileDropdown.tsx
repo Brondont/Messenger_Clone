@@ -6,7 +6,7 @@ import UserSettingsIcon from "../../public/images/profile-settings.png";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-import Usercard from "../usercard/Usercard";
+import Usercard from "../userCard/UserCard";
 
 type User = {
   id: number;

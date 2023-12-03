@@ -1,5 +1,5 @@
 import React from "react";
-import "./Usercard.css";
+import "./UserCard.css";
 
 import calculateTimeAgo from "../../util/timeAgo";
 
@@ -30,7 +30,7 @@ type UserCardProps = {
   onClick?: () => void;
 };
 
-const Usercard: React.FC<UserCardProps> = ({
+const UserCard: React.FC<UserCardProps> = ({
   user,
   options,
   onClick,
@@ -38,13 +38,13 @@ const Usercard: React.FC<UserCardProps> = ({
 }) => {
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
-  const rooturl = process.env.REACT_APP_ROOT_URL;
+  const rootUrl = process.env.REACT_APP_ROOT_URL;
 
   const handleAddFriend = () => {
     if (!user) {
       return;
     }
-    fetch(rooturl + "/addFriend/" + user.id, {
+    fetch(rootUrl + "/addFriend/" + user.id, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
@@ -69,7 +69,7 @@ const Usercard: React.FC<UserCardProps> = ({
       return;
     }
     const type = e.currentTarget.innerHTML;
-    fetch(rooturl + "/removeFriend", {
+    fetch(rootUrl + "/removeFriend", {
       method: "PUT",
       body: JSON.stringify({
         friendId: user.id,
@@ -98,7 +98,7 @@ const Usercard: React.FC<UserCardProps> = ({
           <img
             alt={user.username}
             className="user_card__image"
-            src={rooturl + user.imagePath}
+            src={rootUrl + user.imagePath}
           />
           <div className="user_card__main">
             <span className="user_card__username">{user.username}</span>
@@ -146,4 +146,4 @@ const Usercard: React.FC<UserCardProps> = ({
   );
 };
 
-export default Usercard;
+export default UserCard;
