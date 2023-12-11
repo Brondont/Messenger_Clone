@@ -26,11 +26,13 @@ type UserMessage = {
   status: string;
 };
 
-const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
+const MainChat: React.FC<{
+  Users: User[];
+  setProfileIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ Users = [], setProfileIsOpen }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
-  const [profileIsOpen, setProfileIsOpen] = useState<boolean>(false);
   const [isEmoji, setIsEmoji] = useState<boolean>(false);
   const [messageCount, setMessageCount] = useState<number>(30);
   const [allMessagesRetrieved, setAllMessagesRetrieved] =
@@ -44,7 +46,10 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
   const { socket } = useContext(AuthContext) as AuthContextType;
 
   const updateProfileIsOpen = () => {
-    setProfileIsOpen(!profileIsOpen);
+    setProfileIsOpen((prev) => {
+      console.log("This fired");
+      return !prev;
+    });
   };
 
   const loadMessages = useCallback(() => {
@@ -163,7 +168,7 @@ const MainChat: React.FC<{ Users: User[] }> = ({ Users = [] }) => {
                   className="main_chat__user_options"
                   onClick={updateProfileIsOpen}
                 >
-                  gay
+                  . . .
                 </i>
               </>
             ) : (

@@ -24,7 +24,6 @@ type UserCardProps = {
   user: User | undefined;
   options?: {
     isAddFriend?: boolean;
-    isFriendProfile?: boolean;
     onHover?: boolean;
   };
   onClick?: () => void;
@@ -62,24 +61,6 @@ const UserCard: React.FC<UserCardProps> = ({
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const handleRemoveFriend = (e: React.MouseEvent<HTMLElement>) => {
-    if (!user) {
-      return;
-    }
-    const type = e.currentTarget.innerHTML;
-    fetch(rootUrl + "/removeFriend", {
-      method: "PUT",
-      body: JSON.stringify({
-        friendId: user.id,
-        type: type,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    });
   };
 
   return (
@@ -120,21 +101,11 @@ const UserCard: React.FC<UserCardProps> = ({
             )}
           </div>
           {options ? (
-            (options.isAddFriend && (
+            options.isAddFriend && (
               <div className="add-friend">
                 <button onClick={handleAddFriend}>Add Friend</button>
               </div>
-            )) ||
-            (options.isFriendProfile && userId !== user.id.toString() && (
-              <div className="friend-profile">
-                <div className="unfriend" onClick={handleRemoveFriend}>
-                  Unfriend
-                </div>
-                <div className="block" onClick={handleRemoveFriend}>
-                  Block
-                </div>
-              </div>
-            ))
+            )
           ) : (
             <></>
           )}

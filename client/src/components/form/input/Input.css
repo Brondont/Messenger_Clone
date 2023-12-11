@@ -3,6 +3,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: left;
+  width: 90%;
 }
 
 .invalid {
