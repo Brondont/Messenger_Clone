@@ -3,9 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./SideBar.css";
 
 import Usercard from "../userCard/UserCard";
-import UserProfileDropdown from "../dropdown/UserProfileDropdown";
+import UserProfileDropdown from "../dropDown/UserProfileDropdown";
 import Notifications from "../notifications/Notifications";
-import UserSearch from "../usersearch/UserSearch";
+import UserSearch from "../userSearch/UserSearch";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
