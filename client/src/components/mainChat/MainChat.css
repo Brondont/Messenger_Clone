@@ -17,7 +17,8 @@
 
 .main_chat__user_input {
   width: 99%;
-  margin-bottom: 15px;
+  margin-bottom: 7px;
+  padding-left: 7px;
 }
 
 .main_chat__user_input form {
@@ -25,7 +26,6 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding-right: 10px;
 }
 
 .user_input {
@@ -37,10 +37,26 @@
   background-color: var(--niceGray);
 }
 
-.main_chat__user_message_client_container {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
+.user_input_file {
+  display: none;
+}
+
+.user_file_upload_image {
+  width: 23px;
+  height: 23px;
+}
+.user_file_upload_image:hover {
+  cursor: pointer;
+}
+.user_file_uploaded_preview {
+  border: 2px var(--niceGray) solid;
+  padding: 5px;
+  border-radius: 10px;
+}
+.user_file_uploaded_preview_image {
+  height: 140px;
+  padding: 10px;
+  border-radius: 20px;
 }
 
 .main_chat__user_message_server_container {
@@ -155,17 +171,5 @@
   margin-right: 10px;
 }
 .main_chat__user_options:hover {
-  cursor: pointer;
-}
-
-.emoji_menu {
-  position: fixed;
-  margin-top: -490px;
-}
-.emoji_button {
-  width: 20px;
-  margin-left: 10px;
-}
-.emoji_button:hover {
   cursor: pointer;
 }

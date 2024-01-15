@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import EmojiPicker from "emoji-picker-react";
 import "./MainChat.css";
 
 import { AuthContext, AuthContextType } from "../../authContext";
@@ -8,7 +7,7 @@ import { AuthContext, AuthContextType } from "../../authContext";
 import UserCard from "../userCard/UserCard";
 import Input from "../form/input/Input";
 
-import Emoji from "../../public/images/emoji.png";
+import FileOpenIcon from "../../public/images/blue-open-file.png";
 
 type User = {
   id: number;
@@ -33,10 +32,10 @@ const MainChat: React.FC<{
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
-  const [isEmoji, setIsEmoji] = useState<boolean>(false);
   const [messageCount, setMessageCount] = useState<number>(30);
   const [allMessagesRetrieved, setAllMessagesRetrieved] =
     useState<boolean>(false);
+  const [files, setFiles] = useState<File[]>([]);
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
   const rootUrl = process.env.REACT_APP_ROOT_URL as string;
@@ -47,7 +46,6 @@ const MainChat: React.FC<{
 
   const updateProfileIsOpen = () => {
     setProfileIsOpen((prev) => {
-      console.log("This fired");
       return !prev;
     });
   };
@@ -74,6 +72,21 @@ const MainChat: React.FC<{
       return prevState + 30;
     });
     loadMessages();
+  };
+
+  const handleFileContents: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      setFiles((prevFile: File[]) => {
+        return [...prevFile, file];
+      });
+    }
+  };
+
+  const clearFiles = () => {
+    setFiles([]);
   };
 
   useEffect(() => {
@@ -123,7 +136,15 @@ const MainChat: React.FC<{
     return () => {
       socket.off("newMessage");
     };
-  }, [activeUserWindow, Users, messageCount, loadMessages, socket, userId]);
+  }, [
+    activeUserWindow,
+    files,
+    Users,
+    messageCount,
+    loadMessages,
+    socket,
+    userId,
+  ]);
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -237,25 +258,39 @@ const MainChat: React.FC<{
             )}
           </div>
           <div className="main_chat__user_input">
-            <form onSubmit={sendUserMessage}>
-              <div className="main_chat__emoji">
-                <img
-                  className="emoji_button"
-                  src={Emoji}
-                  alt="emoji"
-                  onClick={() => {
-                    setIsEmoji(!isEmoji);
-                  }}
-                />
-                <div className="emoji_menu">
-                  {isEmoji && (
-                    <EmojiPicker
-                      onEmojiClick={(emoji) => {
-                        setUserMessage(userMessage + emoji.emoji);
-                      }}
+            {files.length > 0 && (
+              <div className="user_file_uploaded_preview">
+                {files.map((file, index) => {
+                  return (
+                    <img
+                      key={index}
+                      className="user_file_uploaded_preview_image"
+                      src={URL.createObjectURL(file)}
+                      alt="uploadedImage"
                     />
-                  )}
-                </div>
+                  );
+                })}
+                <button className="close_button" onClick={clearFiles}>
+                  X
+                </button>
+              </div>
+            )}
+            <form onSubmit={sendUserMessage}>
+              <div className="user_file_upload">
+                <label htmlFor="user_file_input">
+                  <img
+                    src={FileOpenIcon}
+                    className="user_file_upload_image"
+                    alt="fileupload"
+                  />
+                </label>
+                <input
+                  name="user_file_input"
+                  className="user_input_file"
+                  type="file"
+                  id="user_file_input"
+                  onChange={handleFileContents}
+                />
               </div>
               <Input
                 name="user_input"

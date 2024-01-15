@@ -56,6 +56,7 @@ const Input: React.FC<InputProps> = ({
       <input
         className={className && className + (valid ? " valid" : " invalid")}
         placeholder={placeholder}
+        id={name}
         name={name}
         type={type}
         value={value}
