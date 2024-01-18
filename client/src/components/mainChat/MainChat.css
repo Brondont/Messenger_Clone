@@ -49,9 +49,14 @@
   cursor: pointer;
 }
 .user_file_uploaded_preview {
+  display: flex;
   border: 2px var(--niceGray) solid;
   padding: 5px;
   border-radius: 10px;
+}
+
+.close_button {
+  align-self: first;
 }
 .user_file_uploaded_preview_image {
   height: 140px;
@@ -172,4 +177,8 @@
 }
 .main_chat__user_options:hover {
   cursor: pointer;
+}
+
+.chat_image {
+  max-width: 300px;
 }

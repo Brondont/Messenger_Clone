@@ -154,7 +154,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
           />
           <label htmlFor="image">Profile picture</label>
           <Input
-            name="image"
+            name="images"
             type="file"
             onChange={inputChangeHandler}
             errorMessage={errorMessage}

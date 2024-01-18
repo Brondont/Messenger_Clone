@@ -135,16 +135,7 @@ exports.putSignup = (req, res, next) => {
   const errors = validationResult(req);
 
   if (req.fileValidationError) {
-    handleError(req, fileValidationError);
-    const error = new Error(req.fileValidationError, 422, [
-      {
-        type: "invalid",
-        value: "",
-        msg: "We only support jpeg/jpg/png files.",
-        path: "image",
-        location: "body",
-      },
-    ]);
+    handleError(req, 422, fileValidationError);
   }
 
   if (!errors.isEmpty()) {
@@ -153,8 +144,8 @@ exports.putSignup = (req, res, next) => {
   const username = req.body.username;
   const gender = req.body.gender;
   let imagePath = req.body.oldPath;
-  if (req.file) {
-    imagePath = "/" + req.file.path;
+  if (req.files[0]) {
+    imagePath = "/" + req.files[0].path;
   }
   User.findByPk(req.userId)
     .then((user) => {

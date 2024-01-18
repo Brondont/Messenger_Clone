@@ -67,10 +67,11 @@ exports.getUserMessages = (req, res, next) => {
 exports.postUserMessage = (req, res, next) => {
   const message = req.body.message;
   const receiverId = req.body.receiverId;
+  const files = req.files || [];
 
   Message.create({
     message,
-    receiverId: receiverId,
+    receiverId,
     status: "sent",
     senderId: req.userId,
   })
@@ -90,6 +91,32 @@ exports.postUserMessage = (req, res, next) => {
       }
       return next(err);
     });
+  if (files.length < 1) return;
+  files.forEach((file) => {
+    const imagePath = "/" + file.path.replace("\\", "/");
+    Message.create({
+      message: imagePath,
+      receiverId,
+      status: "sent",
+      senderId: req.userId,
+    })
+      .then((createdMessage) => {
+        if (!createdMessage) {
+          handleError("Failed to create message", 500);
+        }
+        io.getIO()
+          .to(receiverId)
+          .to(req.userId)
+          .emit("newMessage", createdMessage);
+        return res.status(201).json({ message: "Message sent successfully !" });
+      })
+      .catch((err) => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        return next(err);
+      });
+  });
 };
 
 exports.getUserContacts = (req, res, next) => {

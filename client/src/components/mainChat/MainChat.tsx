@@ -148,19 +148,22 @@ const MainChat: React.FC<{
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!userMessage.length) {
+    if ((!userMessage.length && !files) || !activeUserWindow) {
       return;
     }
 
-    const userMessageDetails = {
-      message: userMessage,
-      receiverId: activeUserWindow,
-    };
+    const formData = new FormData();
+
+    formData.append("message", userMessage);
+    formData.append("receiverId", activeUserWindow);
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+
     fetch(rootUrl + "/send-message", {
       method: "POST",
-      body: JSON.stringify(userMessageDetails),
+      body: formData,
       headers: {
-        "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
     })
@@ -169,6 +172,7 @@ const MainChat: React.FC<{
       })
       .then((resData) => {
         setUserMessage("");
+        setFiles([]);
       })
       .catch((err) => {
         console.log(err);
@@ -223,13 +227,27 @@ const MainChat: React.FC<{
                           {isCurrentUser ? "You" : activeUser.username}
                         </p>
                       )}
-                      <div
-                        className={`main_chat__user_message_${
-                          isCurrentUser ? "client" : "server"
-                        }`}
-                      >
-                        {message.message}
-                      </div>
+                      {message.message.includes("/images/") ? (
+                        <div
+                          className={`main_chat__user_message_${
+                            isCurrentUser ? "client" : "server"
+                          } `}
+                        >
+                          <img
+                            className="chat_image"
+                            src={rootUrl + message.message}
+                            alt="Pic"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`main_chat__user_message_${
+                            isCurrentUser ? "client" : "server"
+                          }`}
+                        >
+                          {message.message}
+                        </div>
+                      )}
                       {showSenderName && isCurrentUser && (
                         <div className="message__seen">{message.status}</div>
                       )}
