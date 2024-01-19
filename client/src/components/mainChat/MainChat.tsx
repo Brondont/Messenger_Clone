@@ -182,15 +182,15 @@ const MainChat: React.FC<{
   let prevSenderId: number | null = null;
 
   return (
-    <div className="main_chat">
+    <div className="main-chat">
       {Users.length > 0 ? (
         <>
-          <div className="main_chat__user">
+          <div className="main-chat__user">
             {activeUser ? (
               <>
                 <UserCard user={activeUser} />
                 <i
-                  className="main_chat__user_options"
+                  className="main-chat__user-options"
                   onClick={updateProfileIsOpen}
                 >
                   . . .
@@ -200,7 +200,7 @@ const MainChat: React.FC<{
               <div> Loading user...</div>
             )}
           </div>
-          <div className="main_chat__user_messages">
+          <div className="main-chat__messages">
             {activeUser ? (
               <>
                 {messages.map((message) => {
@@ -213,59 +213,58 @@ const MainChat: React.FC<{
 
                   return (
                     <div
-                      className={`main_chat__user_message_${
-                        isCurrentUser ? "client" : "server"
-                      }_container`}
+                      className={`main-chat__messages__message-container ${
+                        isCurrentUser ? "sent-message" : "received-message"
+                      }`}
                       key={message.id}
                     >
                       {showSenderName && (
                         <p
-                          className={`message_${
-                            isCurrentUser ? "client" : "server"
-                          }__name`}
+                          className={`main-chat__messages__sender-name ${
+                            isCurrentUser ? "sent-message" : "received-message"
+                          }`}
                         >
                           {isCurrentUser ? "You" : activeUser.username}
                         </p>
                       )}
-                      {message.message.includes("/images/") ? (
-                        <div
-                          className={`main_chat__user_message_${
-                            isCurrentUser ? "client" : "server"
-                          } `}
-                        >
+                      <div
+                        className={`main-chat__messages__message main-chat__messages__message-${
+                          isCurrentUser ? "sent" : "received"
+                        }`}
+                      >
+                        {message.message.includes("/images/") ? (
                           <img
-                            className="chat_image"
+                            className="main-chat__messages__message-image"
                             src={rootUrl + message.message}
                             alt="Pic"
                           />
-                        </div>
-                      ) : (
-                        <div
-                          className={`main_chat__user_message_${
-                            isCurrentUser ? "client" : "server"
-                          }`}
-                        >
-                          {message.message}
-                        </div>
-                      )}
+                        ) : (
+                          <p className="main-chat__message-text">
+                            {message.message}
+                          </p>
+                        )}
+                      </div>
+
                       {showSenderName && isCurrentUser && (
-                        <div className="message__seen">{message.status}</div>
+                        <div className="main-chat__messages__visibility">
+                          {message.status}
+                        </div>
                       )}
                     </div>
                   );
                 })}
                 {allMessagesRetrieved ? (
-                  <div className="main_chat__user-messages-start">
+                  <div className="main-chat__messages__start">
                     Welcome to the start of ur conversations !
                   </div>
                 ) : (
                   <>
                     {messageCount >= 30 && (
                       <div
-                        className="main_chat__user-load-more"
+                        className="main-chat__messages__more"
                         onClick={handleMoreMessages}
                       >
-                        Load more messages...
+                        Click to load more messages...
                       </div>
                     )}
                   </>
@@ -275,44 +274,44 @@ const MainChat: React.FC<{
               <div>Loading messages...</div>
             )}
           </div>
-          <div className="main_chat__user_input">
+          <div className="main-chat__form">
             {files.length > 0 && (
-              <div className="user_file_uploaded_preview">
+              <div className="main-chat__file--preview">
                 {files.map((file, index) => {
                   return (
                     <img
                       key={index}
-                      className="user_file_uploaded_preview_image"
+                      className="main-chat__file--preview-image"
                       src={URL.createObjectURL(file)}
                       alt="uploadedImage"
                     />
                   );
                 })}
-                <button className="close_button" onClick={clearFiles}>
+                <button className="close-button" onClick={clearFiles}>
                   X
                 </button>
               </div>
             )}
-            <form onSubmit={sendUserMessage}>
-              <div className="user_file_upload">
+            <form className="main-chat__form" onSubmit={sendUserMessage}>
+              <div className="main-chat__form--hidden-inputs">
                 <label htmlFor="user_file_input">
                   <img
                     src={FileOpenIcon}
-                    className="user_file_upload_image"
+                    className="main-chat__form-button"
                     alt="fileupload"
                   />
                 </label>
-                <input
-                  name="user_file_input"
-                  className="user_input_file"
-                  type="file"
-                  id="user_file_input"
-                  onChange={handleFileContents}
-                />
               </div>
+              <input
+                className="main-chat__form--input main-chat__form--input-file"
+                name="user_file_input"
+                type="file"
+                id="user_file_input"
+                onChange={handleFileContents}
+              />
               <Input
                 name="user_input"
-                className="user_input"
+                className="main-chat__form--input main-chat__form--input-text"
                 type="text"
                 placeholder="Aa"
                 value={userMessage}
@@ -324,7 +323,9 @@ const MainChat: React.FC<{
           </div>
         </>
       ) : (
-        <div className="user-no-friends"> Add some friends to chat with !</div>
+        <div className="main-chat__no-friends">
+          Add some friends to chat with !
+        </div>
       )}
     </div>
   );

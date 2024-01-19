@@ -120,10 +120,11 @@ const Login: React.FC<{
       });
   };
   return (
-    <section>
-      <form className="auth-form" onSubmit={handleLogin}>
-        <img src={Logo} alt="Logo" className="main-image" />
+    <section className="auth">
+      <form className="auth__form" onSubmit={handleLogin}>
+        <img src={Logo} alt="Logo" className="auth__form-logo" />
         <Input
+          className="auth__form-input"
           name="email"
           placeholder="Email"
           type="text"
@@ -134,6 +135,7 @@ const Login: React.FC<{
           required={true}
         />
         <Input
+          className="auth__form-input"
           name="password"
           placeholder="Password"
           type="password"
@@ -146,13 +148,13 @@ const Login: React.FC<{
         <button type="submit"> Continue </button>
       </form>
       <p>
-        Don't have an account?
+        Don't have an account ?
         <Link to="/signup">
           <b> Sign up here</b>
         </Link>
       </p>
       <p>
-        Forgot your password?
+        Forgot your password ?
         <Link to="/reset-password">
           <b> Reset password</b>
         </Link>

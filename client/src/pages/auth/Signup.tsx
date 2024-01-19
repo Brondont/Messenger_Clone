@@ -119,9 +119,10 @@ const Singup: React.FC = () => {
   };
 
   return (
-    <section>
-      <form className="auth-form" onSubmit={handleSingup}>
+    <section className="auth">
+      <form className="auth__form" onSubmit={handleSingup}>
         <Input
+          className="auth__form-input"
           name="email"
           placeholder="Email"
           type="text"
@@ -132,6 +133,7 @@ const Singup: React.FC = () => {
           required={true}
         />
         <Input
+          className="auth__form-input"
           name="username"
           placeholder="Username"
           type="text"
@@ -142,6 +144,7 @@ const Singup: React.FC = () => {
           required={true}
         />
         <Input
+          className="auth__form-input"
           name="password"
           placeholder="Password"
           type="password"
@@ -151,16 +154,16 @@ const Singup: React.FC = () => {
           value={signupForm.password.value}
           required={true}
         />
-        <select name="gender">
+        <select className="auth__form-select" name="gender">
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
         <button type="submit"> Continue </button>
       </form>
       <p>
-        Already have an account ?{" "}
+        Already have an account ?
         <Link to="/login">
-          <b>Sign in here</b>
+          <b> Sign in here</b>
         </Link>
       </p>
     </section>

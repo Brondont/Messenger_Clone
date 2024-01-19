@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 import Input from "../../components/form/input/Input";
@@ -127,10 +127,11 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <section>
-      <form className="auth-form" onSubmit={handleSubmit}>
+    <section className="auth">
+      <form className="auth__form" onSubmit={handleSubmit}>
         <label htmlFor="email">Current Email</label>
         <Input
+          className="auth__form-input"
           name="email"
           placeholder="Email"
           type="text"
@@ -142,6 +143,7 @@ const ResetPassword: React.FC = () => {
         />
         <label htmlFor="oldPassword">Old Password</label>
         <Input
+          className="auth__form-input"
           name="oldPassword"
           placeholder="Old Password"
           type="password"
@@ -153,6 +155,7 @@ const ResetPassword: React.FC = () => {
         />
         <label htmlFor="newPassword">New Password</label>
         <Input
+          className="auth__form-input"
           name="newPassword"
           placeholder="New Password"
           type="password"
@@ -164,6 +167,12 @@ const ResetPassword: React.FC = () => {
         />
         <button type="submit"> Continue </button>
       </form>
+      <p>
+        Return to
+        <Link to="/login">
+          <b> Login</b>
+        </Link>
+      </p>
     </section>
   );
 };
