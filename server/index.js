@@ -68,7 +68,7 @@ db.sync()
     });
     const io = require("./socket").init(server);
     io.on("connection", (socket) => {
-      console.log("Client connected!");
+      console.log("Socket client connected!");
       const token = socket.handshake.query.token;
 
       try {
@@ -80,7 +80,7 @@ db.sync()
         }
         const userId = decodedToken.userId;
 
-        console.log("User connected");
+        console.log("Verified connection!");
 
         socket.join(userId);
 

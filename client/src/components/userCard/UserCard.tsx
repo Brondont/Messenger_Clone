@@ -12,7 +12,7 @@ type User = {
 
 type UserMessage = {
   id: number;
-  createdAt: number;
+  createdAt: Date;
   senderId: number;
   receiverId: number;
   message: string;

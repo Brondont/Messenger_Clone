@@ -33,7 +33,7 @@
   overflow-y: scroll;
 }
 
-.main_chat_messages__message-container {
+.main-chat__messages__message-container {
   flex-direction: column;
 }
 
@@ -49,12 +49,10 @@
 }
 
 .main-chat__messages__message {
-  display: block;
   width: fit-content;
   max-width: 40%;
   word-wrap: break-word;
   border-radius: 10px;
-  padding: 15px;
   margin: 2px;
 }
 
@@ -71,7 +69,13 @@
 }
 
 .main-chat__messages__message-image {
-  max-width: 300px;
+  max-width: 350px;
+  border-radius: 10px;
+}
+
+.main-chat__message-text {
+  padding: 10px;
+  margin: 0;
 }
 
 .main-chat__messages__visibility {
@@ -170,7 +174,7 @@
 .main_chat__user_options {
   margin-right: 10px;
 }
-.main_chat__user_options:hover {
+.main-chat__user-options:hover {
   cursor: pointer;
 }
 

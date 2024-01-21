@@ -137,11 +137,12 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
   };
 
   return (
-    <section>
+    <section className="auth">
       {User ? (
-        <form className="auth-form" onSubmit={handleProfileEdit}>
+        <form className="auth__form" onSubmit={handleProfileEdit}>
           <h1> Update your profile </h1>
           <Input
+            className="auth__form-input"
             label="Username"
             name="username"
             placeholder="Username"
@@ -154,6 +155,7 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
           />
           <label htmlFor="image">Profile picture</label>
           <Input
+            className="auth__form-input"
             name="images"
             type="file"
             onChange={inputChangeHandler}
@@ -162,7 +164,11 @@ const EditProfile: React.FC<{ User: User | undefined }> = ({ User }) => {
             required={false}
           />
           <label htmlFor="gender">Gender</label>
-          <select name="gender" defaultValue={User.gender}>
+          <select
+            className="auth__form-select"
+            name="gender"
+            defaultValue={User.gender}
+          >
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>

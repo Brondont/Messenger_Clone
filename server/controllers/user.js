@@ -10,16 +10,16 @@ const Notification = require("../models/notification");
 const { handleError } = require("../util/error");
 
 exports.getUserMessages = (req, res, next) => {
-  const receivingUserId = req.params.receiverId;
+  const senderId = req.params.receiverId;
+  const receiverId = req.userId;
   const messageCount = +req.params.messageCount || 30;
 
   let allMessagesRetrieved = false;
-
   Message.count({
     where: {
       [Op.or]: [
-        { senderId: receivingUserId, receiverId: req.userId }, // Messages from user1 to user2
-        { senderId: req.userId, receiverId: receivingUserId }, // Messages from user2 to user1
+        { senderId: senderId, receiverId: receiverId }, // Messages from user1 to user2
+        { senderId: receiverId, receiverId: senderId }, // Messages from user2 to user1
       ],
     },
   })
@@ -31,8 +31,8 @@ exports.getUserMessages = (req, res, next) => {
         attributes: ["message", "createdAt", "id", "senderId", "status"],
         where: {
           [Op.or]: [
-            { senderId: receivingUserId, receiverId: req.userId }, // Messages from user1 to user2
-            { senderId: req.userId, receiverId: receivingUserId }, // Messages from user2 to user1
+            { senderId: senderId, receiverId: receiverId }, // Messages from user1 to user2
+            { senderId: receiverId, receiverId: senderId }, // Messages from user2 to user1
           ],
         },
       });
@@ -44,12 +44,12 @@ exports.getUserMessages = (req, res, next) => {
         ]);
       }
       res.status(200).json({ messages, allMessagesRetrieved });
-      io.getIO().to(receivingUserId).to(req.userId).emit("seenMessage", {
-        receiverId: req.userId,
-        senderId: receivingUserId, // have to flip them since the user that is making the request is the "sender" even tho he is the one that received the message
+      io.getIO().to(senderId).emit("receiverSawMessages", {
+        receiverId,
+        senderId,
       });
       return messages.map((message) => {
-        if (message.senderId.toString() === req.userId) {
+        if (message.senderId.toString() === receiverId) {
           return message.save();
         }
         message.status = "seen";
@@ -127,30 +127,13 @@ exports.getUserContacts = (req, res, next) => {
     },
   })
     .then((friendRequests) => {
+      if (!friendRequests) {
+        handleError("Error in getting user contacts.", 404);
+      }
       if (friendRequests.length < 1) {
         return User.findAll({
           attributes: ["username", "id", "email", "gender", "imagePath"],
           where: { id: req.userId },
-          include: [
-            {
-              model: Message,
-              as: "SentMessages",
-              limit: 1,
-              order: [["id", "DESC"]],
-              where: {
-                [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
-              },
-            },
-            {
-              model: Message,
-              as: "ReceivedMessages",
-              limit: 1,
-              order: [["id", "DESC"]],
-              where: {
-                [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
-              },
-            },
-          ],
         });
       }
       return User.findAll({
@@ -160,26 +143,6 @@ exports.getUserContacts = (req, res, next) => {
             return [friendRequest.userId1, friendRequest.userId2];
           }),
         },
-        include: [
-          {
-            model: Message,
-            as: "SentMessages",
-            limit: 1,
-            order: [["id", "DESC"]],
-            where: {
-              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
-            },
-          },
-          {
-            model: Message,
-            as: "ReceivedMessages",
-            limit: 1,
-            order: [["id", "DESC"]],
-            where: {
-              [Op.or]: [{ senderId: req.userId }, { receiverId: req.userId }],
-            },
-          },
-        ],
       });
     })
     .then((users) => {
@@ -187,6 +150,51 @@ exports.getUserContacts = (req, res, next) => {
         handleError("No users found", 404);
       }
       return res.status(200).json({ users });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      return next(err);
+    });
+};
+
+exports.getNewestMessages = (req, res, next) => {
+  Friend.findAll({
+    where: {
+      type: "Accepted",
+      [Op.or]: [{ userId1: req.userId }, { userId2: req.userId }],
+    },
+  })
+    .then((friendRequests) => {
+      if (!friendRequests) {
+        handleError("Error in getting newest messages.", 404);
+      }
+      const messagePromises = friendRequests.map((friendRequest) => {
+        return Message.findOne({
+          where: {
+            [Op.or]: [
+              {
+                senderId: friendRequest.userId1,
+                receiverId: friendRequest.userId2,
+              },
+              {
+                senderId: friendRequest.userId2,
+                receiverId: friendRequest.userId1,
+              },
+            ],
+          },
+          order: [["createdAt", "DESC"]],
+        });
+      });
+
+      return Promise.all(messagePromises);
+    })
+    .then((messages) => {
+      if (!messages) {
+        return res.status(200).json({ newestMessage: [] });
+      }
+      return res.status(200).json({ newestMessages: messages });
     })
     .catch((err) => {
       if (!err.statusCode) {

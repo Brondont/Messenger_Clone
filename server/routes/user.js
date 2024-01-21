@@ -15,6 +15,8 @@ route.post("/send-message", isAuth, userControllers.postUserMessage);
 
 route.get("/userContacts/", isAuth, userControllers.getUserContacts);
 
+route.get("/newestMessages", isAuth, userControllers.getNewestMessages);
+
 route.get("/usersSearch/:userName", isAuth, userControllers.getUsersSearched);
 
 route.post("/addFriend/:friendId", isAuth, userControllers.postAddFriend);

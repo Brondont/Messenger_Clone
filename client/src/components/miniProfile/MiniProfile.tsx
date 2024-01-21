@@ -17,8 +17,6 @@ type User = {
   username: string;
   imagePath: string;
   gender: string;
-  ReceivedMessages: UserMessage[];
-  SentMessages: UserMessage[];
 };
 
 const MiniProfile: React.FC<{

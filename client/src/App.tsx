@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import socketIOClient, { Socket } from "socket.io-client";
 import { ErrorBoundary } from "react-error-boundary";
 import "./App.css";
@@ -23,8 +17,6 @@ type User = {
   username: string;
   imagePath: string;
   gender: string;
-  ReceivedMessages: UserMessage[];
-  SentMessages: UserMessage[];
 };
 
 type UserMessage = {
@@ -43,7 +35,6 @@ const App: React.FC = () => {
   const [clientUser, setClientUser] = useState<User>();
   const [socket, setSocket] = useState<Socket>();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const rooturl = process.env.REACT_APP_ROOT_URL as string;
 
@@ -110,11 +101,10 @@ const App: React.FC = () => {
     });
 
     setSocket(newSocket);
-
     return () => {
-      setSocket(newSocket.disconnect());
+      newSocket.disconnect();
     };
-  }, [location, rooturl]);
+  }, [rooturl]);
 
   const handleUsers = (user: User, action: string) => {
     switch (action) {
@@ -141,6 +131,10 @@ const App: React.FC = () => {
     }
   };
 
+  const updateUsers = (updatedUsers: User[]) => {
+    setUsers(updatedUsers);
+  };
+
   let routes;
   isAuth
     ? (routes = (
@@ -148,7 +142,12 @@ const App: React.FC = () => {
           <Route
             path="/m/:receiverId"
             element={
-              <Home Users={users} handleUsers={handleUsers} socket={socket} />
+              <Home
+                Users={users}
+                updateUsers={updateUsers}
+                handleUsers={handleUsers}
+                socket={socket}
+              />
             }
           ></Route>
           <Route

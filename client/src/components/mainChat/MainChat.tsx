@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "./MainChat.css";
-
-import { AuthContext, AuthContextType } from "../../authContext";
 
 import UserCard from "../userCard/UserCard";
 import Input from "../form/input/Input";
@@ -18,7 +16,7 @@ type User = {
 
 type UserMessage = {
   id: number;
-  createdAt: number;
+  createdAt: Date;
   senderId: number;
   receiverId: number;
   message: string;
@@ -28,7 +26,8 @@ type UserMessage = {
 const MainChat: React.FC<{
   Users: User[];
   setProfileIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ Users = [], setProfileIsOpen }) => {
+  setNewestMessages: React.Dispatch<React.SetStateAction<UserMessage[]>>;
+}> = ({ Users = [], setProfileIsOpen, setNewestMessages }) => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [activeUser, setActiveUser] = useState<User>();
@@ -36,13 +35,12 @@ const MainChat: React.FC<{
   const [allMessagesRetrieved, setAllMessagesRetrieved] =
     useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
   const rootUrl = process.env.REACT_APP_ROOT_URL as string;
   const token = localStorage.getItem("token") as string;
   const userId = localStorage.getItem("userId") as string;
-
-  const { socket } = useContext(AuthContext) as AuthContextType;
 
   const updateProfileIsOpen = () => {
     setProfileIsOpen((prev) => {
@@ -58,7 +56,6 @@ const MainChat: React.FC<{
         return res.json();
       })
       .then((resData) => {
-        console.log(resData);
         setMessages(resData.messages);
         setAllMessagesRetrieved(resData.allMessagesRetrieved);
       })
@@ -90,65 +87,29 @@ const MainChat: React.FC<{
   };
 
   useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
     if (!activeUserWindow) {
       return;
     }
 
-    loadMessages();
     setActiveUser(
       Users.find((user: User) => {
         return user.id.toString() === activeUserWindow;
       })
     );
 
-    if (!socket) {
-      return;
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
-    socket.on("newMessage", (message: UserMessage) => {
-      if (
-        (activeUserWindow === message.receiverId.toString() &&
-          userId === message.senderId.toString()) ||
-        (userId === message.receiverId.toString() &&
-          activeUserWindow === message.senderId.toString())
-      ) {
-        setMessages((prevMessages: UserMessage[]) => {
-          return [
-            message,
-            ...prevMessages.map((message) => {
-              return { ...message, status: "seen" };
-            }),
-          ];
-        });
-      }
-    });
-
-    socket.on("seenMessage", () => {
-      setMessages((prevMessages: UserMessage[]) => {
-        return prevMessages.map((message: UserMessage) => {
-          if (message.senderId.toString() === activeUserWindow) {
-            return message;
-          }
-          return { ...message, status: "seen" };
-        });
-      });
-    });
-
-    return () => {
-      socket.off("newMessage");
-    };
-  }, [
-    activeUserWindow,
-    files,
-    Users,
-    messageCount,
-    loadMessages,
-    socket,
-    userId,
-  ]);
+  }, [Users, activeUserWindow, messages]);
 
   const sendUserMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!userMessage.length && !files) || !activeUserWindow) {
+    if ((!userMessage.length && !files.length) || !activeUserWindow) {
       return;
     }
 
@@ -171,8 +132,31 @@ const MainChat: React.FC<{
         return res.json();
       })
       .then((resData) => {
+        // set the newest message
+        setNewestMessages((prevMessages: UserMessage[]) => {
+          return prevMessages.map((message: UserMessage) => {
+            if (
+              message &&
+              ((message.senderId === +userId &&
+                message.receiverId === +activeUserWindow) ||
+                (message.senderId === +activeUserWindow &&
+                  message.receiverId === +userId))
+            ) {
+              return {
+                ...message,
+                id: Math.random(),
+                status: "sent",
+                message: userMessage,
+                createdAt: new Date(),
+              };
+            }
+            return message;
+          });
+        });
+        // reset
         setUserMessage("");
         setFiles([]);
+        loadMessages();
       })
       .catch((err) => {
         console.log(err);
@@ -276,7 +260,7 @@ const MainChat: React.FC<{
           </div>
           <div className="main-chat__form">
             {files.length > 0 && (
-              <div className="main-chat__file--preview">
+              <div className="  ">
                 {files.map((file, index) => {
                   return (
                     <img

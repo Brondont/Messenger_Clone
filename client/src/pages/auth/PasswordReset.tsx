@@ -168,9 +168,8 @@ const ResetPassword: React.FC = () => {
         <button type="submit"> Continue </button>
       </form>
       <p>
-        Return to
         <Link to="/login">
-          <b> Login</b>
+          <b> Cancel </b>
         </Link>
       </p>
     </section>
