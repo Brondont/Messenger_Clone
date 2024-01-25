@@ -23,9 +23,9 @@ type Form = {
   };
 };
 
-const Login: React.FC<{
-  setUserLogin: (userId: string, token: string) => void;
-}> = ({ setUserLogin }) => {
+const Login: React.FC<{ setUserLogin: (userId: string) => void }> = ({
+  setUserLogin,
+}) => {
   const [errorMessage, setErrorMessages] = useState<ErrorServerResponse[]>([]);
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [loginForm, setLoginForm] = useState<Form>({
@@ -103,7 +103,6 @@ const Login: React.FC<{
             throw resData.error;
           }
         }
-        setUserLogin(resData.userId, resData.token);
         localStorage.setItem("userId", resData.userId);
         localStorage.setItem("token", resData.token);
         const remainingMiliseconds = 60 * 60 * 1000;
@@ -111,8 +110,8 @@ const Login: React.FC<{
           new Date().getTime() + remainingMiliseconds
         );
         localStorage.setItem("expiryDate", expiryDate.toISOString());
-        console.log("user Logged in successfully !");
         setIsloading(false);
+        setUserLogin(resData.userId);
       })
       .catch((err) => {
         setIsloading(false);

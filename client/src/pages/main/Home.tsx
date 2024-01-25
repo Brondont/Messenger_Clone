@@ -1,25 +1,11 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 
 import MainChat from "../../components/mainChat/MainChat";
 import SideBar from "../../components/sideBar/SideBar";
 import MiniProfile from "../../components/miniProfile/MiniProfile";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
-
-type UserMessage = {
-  id: number;
-  createdAt: Date;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  status: string;
-};
+import { User, UserMessage } from "../../userTypes";
 
 type HomePageProps = {
   socket: Socket | undefined;
@@ -35,49 +21,32 @@ const Home: React.FC<HomePageProps> = ({
   updateUsers,
 }) => {
   const [profileIsOpen, setProfileIsOpen] = useState<boolean>(false);
-  const [newestMessages, setNewestMessages] = useState<UserMessage[]>([]);
 
-  const rootUrl = process.env.REACT_APP_ROOT_URL as string;
   const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    if (!Users || !socket) {
+    if (!Users || !socket || !userId || !token) {
       return;
     }
 
-    fetch(rootUrl + "/newestMessages", {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        setNewestMessages(resData.newestMessages);
-      });
-
     socket.on("newMessage", (newMessage: UserMessage) => {
-      setNewestMessages((prevMessages: UserMessage[]) => {
-        return prevMessages.map((message: UserMessage) => {
-          if (
-            message &&
-            ((message.senderId.toString() === newMessage.senderId.toString() &&
-              message.receiverId.toString() ===
-                newMessage.receiverId.toString()) ||
-              (message.senderId.toString() ===
-                newMessage.receiverId.toString() &&
-                message.receiverId.toString() ===
-                  newMessage.senderId.toString()))
-          ) {
-            return {
-              ...newMessage,
-            };
-          }
-          return message;
-        });
+      console.log(newMessage);
+      const newUsers = Users.map((user) => {
+        if (
+          (user.id.toString() === newMessage.senderId.toString() &&
+            userId === newMessage.receiverId.toString()) ||
+          (userId === newMessage.senderId.toString() &&
+            user.id.toString() === newMessage.receiverId.toString())
+        ) {
+          user.message = newMessage;
+        }
+        return user;
       });
+      updateUsers(newUsers);
     });
+
+    socket.on("receiverSawMessages", ({ receiverId, senderId }) => {});
 
     socket.on("friendAccept", (user: User) => {
       handleUsers(user, "ADD");
@@ -95,14 +64,14 @@ const Home: React.FC<HomePageProps> = ({
       socket.off("friendAccept");
       socket.off("friendRemove");
     };
-  }, [socket, updateUsers, Users, rootUrl, token, handleUsers]);
+  }, [socket, updateUsers, Users, token, handleUsers, userId]);
   return (
     <>
-      <SideBar Users={Users} newestMessage={newestMessages} />
+      <SideBar Users={Users} />
       <MainChat
         Users={Users}
         setProfileIsOpen={setProfileIsOpen}
-        setNewestMessages={setNewestMessages}
+        updateUsers={updateUsers}
       />
       {profileIsOpen && <MiniProfile Users={Users} />}
     </>

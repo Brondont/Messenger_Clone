@@ -64,59 +64,74 @@ exports.getUserMessages = (req, res, next) => {
     });
 };
 
-exports.postUserMessage = (req, res, next) => {
+exports.postUserMessage = async (req, res, next) => {
   const message = req.body.message;
   const receiverId = req.body.receiverId;
   const files = req.files || [];
 
-  Message.create({
-    message,
-    receiverId,
-    status: "sent",
-    senderId: req.userId,
-  })
-    .then((createdMessage) => {
-      if (!createdMessage) {
-        handleError("Failed to create message", 500);
-      }
-      io.getIO()
-        .to(receiverId)
-        .to(req.userId)
-        .emit("newMessage", createdMessage);
-      return res.status(201).json({ message: "Message sent successfully !" });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      return next(err);
-    });
-  if (files.length < 1) return;
-  files.forEach((file) => {
-    const imagePath = "/" + file.path.replace("\\", "/");
-    Message.create({
-      message: imagePath,
+  let textPromise;
+  let filesPromises;
+
+  if (message.length > 0) {
+    textPromise = Message.create({
+      message,
       receiverId,
-      status: "sent",
       senderId: req.userId,
+      status: "sent",
     })
       .then((createdMessage) => {
         if (!createdMessage) {
-          handleError("Failed to create message", 500);
+          handleError(500, "Failed to create message");
         }
-        io.getIO()
-          .to(receiverId)
-          .to(req.userId)
-          .emit("newMessage", createdMessage);
-        return res.status(201).json({ message: "Message sent successfully !" });
+        io.getIO().to(receiverId).emit("newMessage", createdMessage);
+        return createdMessage;
       })
       .catch((err) => {
         if (!err.statusCode) {
           err.statusCode = 500;
         }
-        return next(err);
+        return Promise.reject(err);
       });
-  });
+  }
+
+  if (files) {
+    filesPromises = Promise.all(
+      files.map((file) => {
+        const imagePath = "/" + file.path.replace("\\", "/");
+        return Message.create({
+          message: imagePath,
+          receiverId,
+          status: "sent",
+          senderId: req.userId,
+        })
+          .then((createdMessage) => {
+            if (!createdMessage) {
+              handleError(500, "Failed to upload files.");
+            }
+            io.getIO().to(receiverId).emit("newMessage", createdMessage);
+            return createdMessage;
+          })
+          .catch((err) => {
+            if (!err.statusCode) {
+              err.statusCode = 500;
+            }
+            return Promise.reject(err);
+          });
+      })
+    );
+  }
+
+  Promise.all([textPromise, filesPromises])
+    .then((messages) => {
+      console.log(messages);
+      return res.status(200).json({ messaege: "files sent succesfully" });
+    })
+    .catch((err) => {
+      if (!err) {
+        err.statusCode = 500;
+      }
+      return next(err);
+    });
 };
 
 exports.getUserContacts = (req, res, next) => {

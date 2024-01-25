@@ -3,24 +3,10 @@ import "./UserCard.css";
 
 import calculateTimeAgo from "../../util/timeAgo";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
-
-type UserMessage = {
-  id: number;
-  createdAt: Date;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  status: string;
-};
+import { User } from "../../userTypes";
 
 type UserCardProps = {
-  lastMessage?: UserMessage | undefined;
+  lastMessage?: boolean | undefined;
   user: User | undefined;
   options?: {
     isAddFriend?: boolean;
@@ -83,20 +69,20 @@ const UserCard: React.FC<UserCardProps> = ({
           />
           <div className="user_card__main">
             <span className="user_card__username">{user.username}</span>
-            {lastMessage && (
+            {user.message && lastMessage && (
               <>
                 <div
                   className={
-                    lastMessage.status === "seen"
+                    user.message.status === "seen"
                       ? "last-message"
                       : "last-message active_message"
                   }
                 >
-                  {(lastMessage.senderId.toString() === userId
+                  {(user.message.senderId.toString() === userId
                     ? "You: "
-                    : user.username + ": ") + lastMessage.message}
+                    : user.username + ": ") + user.message.message}
                 </div>
-                <>{calculateTimeAgo(lastMessage.createdAt.toString())}</>
+                <>{calculateTimeAgo(user.message.createdAt.toString())}</>
               </>
             )}
           </div>

@@ -3,12 +3,7 @@ import "./UserSearch.css";
 
 import UserCard from "../userCard/UserCard";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
+import { User } from "../../userTypes";
 
 const UserSearch: React.FC = () => {
   const [usersSearched, setUsersSearched] = useState<User[]>([]);

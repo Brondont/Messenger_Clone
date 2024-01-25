@@ -8,12 +8,7 @@ import { AuthContext, AuthContextType } from "../../authContext";
 
 import Usercard from "../userCard/UserCard";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
+import { User } from "../../userTypes";
 
 const UserProfileDropdown: React.FC<{ User: User | undefined }> = ({
   User,

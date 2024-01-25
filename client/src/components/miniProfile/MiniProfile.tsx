@@ -3,21 +3,7 @@ import { useParams } from "react-router-dom";
 
 import "./MiniProfile.css";
 
-type UserMessage = {
-  id: number;
-  createdAt: number;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  status: string;
-};
-
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
+import { User } from "../../userTypes";
 
 const MiniProfile: React.FC<{
   Users: User[];

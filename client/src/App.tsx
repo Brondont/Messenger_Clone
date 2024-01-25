@@ -12,21 +12,7 @@ import Signup from "./pages/auth/Signup";
 import EditProfile from "./pages/auth/EditProfile";
 import ResetPassword from "./pages/auth/PasswordReset";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
-
-type UserMessage = {
-  id: number;
-  createdAt: number;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  status: string;
-};
+import { User, UserMessage } from "./userTypes";
 
 const App: React.FC = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
@@ -36,9 +22,9 @@ const App: React.FC = () => {
   const [socket, setSocket] = useState<Socket>();
   const navigate = useNavigate();
 
-  const rooturl = process.env.REACT_APP_ROOT_URL as string;
+  const rootUrl = process.env.REACT_APP_ROOT_URL as string;
 
-  const setUserLogin = (userId: string, token: string) => {
+  const setUserLogin = (userId: string) => {
     setUserId(userId);
     setIsAuth(true);
   };
@@ -62,9 +48,10 @@ const App: React.FC = () => {
       logoutHandler();
       return;
     }
-    setUserLogin(storedUserId, token);
+    setUserLogin(storedUserId);
 
-    fetch(rooturl + "/userContacts", {
+    let newUsers = [] as User[];
+    fetch(rootUrl + "/userContacts", {
       headers: {
         Authorization: "Bearer " + token,
       },
@@ -73,20 +60,66 @@ const App: React.FC = () => {
         return res.json();
       })
       .then((resData) => {
-        setUsers(
-          resData.users.map((user: User) => {
-            if (user.id.toString() === storedUserId) {
-              setClientUser(user);
-            }
-            return { ...user };
+        newUsers = resData.users;
+        return fetch(rootUrl + "/newestMessages", {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        const newestMessages = resData.newestMessages;
+
+        // attach newest messages to each user
+        newestMessages.forEach((newestMessage: UserMessage) => {
+          newUsers = newUsers.map((user) => {
+            const message = newestMessages.find((newMessage: UserMessage) => {
+              return (
+                newMessage &&
+                ((newMessage.senderId.toString() === userId &&
+                  newMessage.receiverId.toString() === user.id.toString()) ||
+                  (newMessage.senderId.toString() === user.id.toString() &&
+                    newMessage.receiverId.toString() === userId))
+              );
+            });
+            return { ...user, message };
+          });
+        });
+
+        //sort users depending on last message time
+        newUsers.sort((userA, userB) => {
+          const createdAtA = userA.message?.createdAt;
+          const createdAtB = userB.message?.createdAt;
+
+          const dateA = createdAtA ? new Date(createdAtA) : null;
+          const dateB = createdAtB ? new Date(createdAtB) : null;
+
+          if (dateA && dateB) {
+            return dateB.getTime() - dateA.getTime();
+          } else if (dateA) {
+            return -1;
+          } else if (dateB) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+
+        setClientUser(
+          newUsers.find((user) => {
+            return user.id.toString() === userId;
           })
         );
+        setUsers(newUsers);
       })
       .catch((err) => {
         console.log(err);
       });
 
-    const newSocket: Socket = socketIOClient(rooturl, {
+    const newSocket: Socket = socketIOClient(rootUrl, {
       query: {
         token,
       },
@@ -104,7 +137,7 @@ const App: React.FC = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, [rooturl]);
+  }, [rootUrl, userId]);
 
   const handleUsers = (user: User, action: string) => {
     switch (action) {

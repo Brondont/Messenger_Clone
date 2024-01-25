@@ -1,12 +1,7 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
+import { User } from "./userTypes";
 
 export type AuthContextType = {
   clientUser: User | undefined;

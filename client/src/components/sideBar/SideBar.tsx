@@ -9,32 +9,16 @@ import UserSearch from "../userSearch/UserSearch";
 
 import { AuthContext, AuthContextType } from "../../authContext";
 
-type User = {
-  id: number;
-  username: string;
-  imagePath: string;
-  gender: string;
-};
-
-type UserMessage = {
-  id: number;
-  createdAt: Date;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  status: string;
-};
+import { User } from "../../userTypes";
 
 const SideBar: React.FC<{
   Users: User[];
-  newestMessage: UserMessage[];
-}> = ({ Users = [], newestMessage = [] }) => {
+}> = ({ Users = [] }) => {
   const navigate = useNavigate();
 
   const { clientUser } = useContext(AuthContext) as AuthContextType;
 
   const activeUserWindow = useParams<{ receiverId: string }>().receiverId;
-  const userId = localStorage.getItem("userId") as string;
 
   return (
     <div className="main_sidebar">
@@ -44,20 +28,11 @@ const SideBar: React.FC<{
       </div>
       <div className="user_messages">
         {Users.map((user: User) => {
-          const message = newestMessage.find((newMessage) => {
-            return (
-              newMessage &&
-              ((newMessage.senderId.toString() === userId &&
-                newMessage.receiverId.toString() === user.id.toString()) ||
-                (newMessage.senderId.toString() === user.id.toString() &&
-                  newMessage.receiverId.toString() === userId))
-            );
-          });
           return (
             <Usercard
               key={user.id}
               user={user}
-              lastMessage={message}
+              lastMessage={true}
               onClick={() => {
                 if (activeUserWindow === user.id.toString()) {
                   return;
